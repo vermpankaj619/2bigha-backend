@@ -1,0 +1,273 @@
+# Authentication Queries
+mutation AdminLogin($input: AdminLoginInput!) {
+  adminLogin(input: $input) {
+    success
+    message
+    token
+    admin {
+      id
+      firstName
+      lastName
+      email
+      role
+    }
+  }
+}
+
+query Me {
+  me {
+    id
+    firstName
+    lastName
+    email
+    role
+    isActive
+    lastLoginAt
+  }
+}
+
+# Analytics Queries
+query GetAnalytics($period: String) {
+  analytics(period: $period) {
+    totalProperties
+    totalUsers
+    totalInquiries
+    pendingApprovals
+    totalRevenue
+    propertyViews
+    userRegistrations
+    revenueData {
+      date
+      amount
+    }
+    propertyData {
+      date
+      count
+    }
+    inquiryData {
+      date
+      count
+    }
+    spatialData {
+      region
+      count
+      averagePrice
+    }
+  }
+}
+
+# Property Management Queries
+query GetProperties($filter: PropertyFilter, $limit: Int, $offset: Int) {
+  properties(filters: $filter, limit: $limit, offset: $offset) {
+    id
+    uuid
+    title
+    description
+    price
+    area
+    bedrooms
+    bathrooms
+    address
+    city
+    state
+    propertyType
+    listingType
+    status
+    isFeatured
+    isVerified
+    viewCount
+    createdAt
+    agent {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+}
+
+query GetProperty($id: ID, $uuid: String) {
+  property(id: $id, uuid: $uuid) {
+    id
+    uuid
+    title
+    description
+    price
+    area
+    areaUnit
+    bedrooms
+    bathrooms
+    floors
+    parking
+    furnished
+    address
+    city
+    state
+    country
+    latitude
+    longitude
+    propertyType
+    listingType
+    status
+    images
+    amenities
+    features
+    isFeatured
+    isVerified
+    viewCount
+    createdAt
+    updatedAt
+    agent {
+      id
+      firstName
+      lastName
+      email
+      profile {
+        phone
+        avatar
+      }
+    }
+    inquiries {
+      id
+      name
+      email
+      message
+      status
+      priority
+      createdAt
+    }
+  }
+}
+
+# Property Mutations
+mutation CreateProperty($input: CreatePropertyInput!) {
+  createProperty(input: $input) {
+    id
+    uuid
+    title
+    price
+    propertyType
+    status
+    createdAt
+  }
+}
+
+mutation UpdateProperty($id: ID!, $input: UpdatePropertyInput!) {
+  updateProperty(id: $id, input: $input) {
+    id
+    title
+    price
+    status
+    updatedAt
+  }
+}
+
+# Inquiry Management
+query GetPropertyInquiries($filter: InquiryFilter, $limit: Int, $offset: Int) {
+  propertyInquiries(filter: $filter, limit: $limit, offset: $offset) {
+    id
+    uuid
+    name
+    email
+    phone
+    message
+    status
+    priority
+    isRead
+    isStarred
+    isFlagged
+    responseCount
+    lastResponseAt
+    createdAt
+    property {
+      id
+      title
+      price
+      city
+    }
+  }
+}
+
+query GetPropertyInquiry($id: ID!) {
+  propertyInquiry(id: $id) {
+    id
+    uuid
+    name
+    email
+    phone
+    message
+    status
+    priority
+    isRead
+    isStarred
+    isFlagged
+    responseCount
+    lastResponseAt
+    createdAt
+    property {
+      id
+      title
+      price
+      address
+    }
+    responses {
+      id
+      message
+      isInternal
+      createdAt
+      responder {
+        firstName
+        lastName
+        email
+      }
+    }
+  }
+}
+
+# Inquiry Mutations
+mutation UpdateInquiryStatus($id: ID!, $status: InquiryStatus!) {
+  updateInquiryStatus(id: $id, status: $status) {
+    id
+    status
+  }
+}
+
+mutation RespondToInquiry($inquiryId: ID!, $message: String!) {
+  respondToInquiry(inquiryId: $inquiryId, message: $message) {
+    id
+    message
+    createdAt
+    responder {
+      firstName
+      lastName
+    }
+  }
+}
+
+mutation StarInquiry($id: ID!) {
+  starInquiry(id: $id) {
+    id
+    isStarred
+  }
+}
+
+# File Upload
+mutation UploadPropertyImages($files: [Upload!]!) {
+  uploadMultipleFiles(files: $files) {
+    filename
+    url
+    mimetype
+  }
+}
+
+# Property View Tracking
+mutation RecordPropertyView($propertyId: ID!) {
+  recordPropertyView(propertyId: $propertyId) {
+    id
+    viewedAt
+    property {
+      id
+      viewCount
+    }
+  }
+}

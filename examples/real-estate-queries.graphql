@@ -1,0 +1,183 @@
+# Get all properties with filters
+query GetProperties($filters: PropertyFilters, $limit: Int, $offset: Int) {
+  properties(filters: $filters, limit: $limit, offset: $offset) {
+    id
+    uuid
+    title
+    description
+    propertyType
+    listingType
+    status
+    price
+    area
+    areaUnit
+    bedrooms
+    bathrooms
+    address
+    city
+    state
+    latitude
+    longitude
+    images
+    amenities
+    isFeatured
+    isVerified
+    viewCount
+    createdAt
+    agent {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+}
+
+# Get nearby properties using spatial query
+query GetNearbyProperties($latitude: Float!, $longitude: Float!, $radius: Float!, $limit: Int) {
+  nearbyProperties(latitude: $latitude, longitude: $longitude, radius: $radius, limit: $limit) {
+    id
+    title
+    price
+    address
+    city
+    latitude
+    longitude
+    propertyType
+    listingType
+  }
+}
+
+# Get featured properties
+query GetFeaturedProperties($limit: Int) {
+  featuredProperties(limit: $limit) {
+    id
+    uuid
+    title
+    price
+    area
+    bedrooms
+    bathrooms
+    address
+    city
+    images
+    isFeatured
+  }
+}
+
+# Get single property with full details
+query GetProperty($id: ID, $uuid: String) {
+  property(id: $id, uuid: $uuid) {
+    id
+    uuid
+    title
+    description
+    propertyType
+    listingType
+    status
+    price
+    area
+    areaUnit
+    bedrooms
+    bathrooms
+    floors
+    parking
+    furnished
+    address
+    city
+    state
+    country
+    postalCode
+    latitude
+    longitude
+    images
+    amenities
+    features
+    isFeatured
+    isVerified
+    viewCount
+    createdAt
+    updatedAt
+    agent {
+      id
+      firstName
+      lastName
+      email
+      profile {
+        phone
+        avatar
+      }
+    }
+    inquiries {
+      id
+      name
+      email
+      message
+      status
+      createdAt
+    }
+  }
+}
+
+# Create new property
+mutation CreateProperty($input: PropertyInput!) {
+  createProperty(input: $input) {
+    id
+    uuid
+    title
+    status
+    createdAt
+  }
+}
+
+# Create property inquiry
+mutation CreatePropertyInquiry($input: PropertyInquiryInput!) {
+  createPropertyInquiry(input: $input) {
+    id
+    uuid
+    name
+    email
+    message
+    status
+    createdAt
+    property {
+      id
+      title
+    }
+  }
+}
+
+# Record property view
+mutation RecordPropertyView($propertyId: ID!) {
+  recordPropertyView(propertyId: $propertyId) {
+    id
+    viewedAt
+    property {
+      id
+      viewCount
+    }
+  }
+}
+
+# Respond to inquiry
+mutation RespondToInquiry($inquiryId: ID!, $message: String!, $isInternal: Boolean) {
+  respondToInquiry(inquiryId: $inquiryId, message: $message, isInternal: $isInternal) {
+    id
+    message
+    isInternal
+    createdAt
+    responder {
+      firstName
+      lastName
+    }
+  }
+}
+
+# Upload property images
+mutation UploadPropertyImages($files: [Upload!]!) {
+  uploadMultipleFiles(files: $files) {
+    filename
+    url
+    mimetype
+  }
+}

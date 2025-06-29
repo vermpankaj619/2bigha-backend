@@ -1,0 +1,49 @@
+# Query all users
+query GetUsers {
+  users {
+    id
+    name
+    email
+    avatar
+  }
+}
+
+# Query single user
+query GetUser($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    email
+    avatar
+  }
+}
+
+# Upload single file
+mutation UploadFile($file: Upload!) {
+  uploadFile(file: $file) {
+    filename
+    mimetype
+    encoding
+    url
+  }
+}
+
+# Upload multiple files
+mutation UploadMultipleFiles($files: [Upload!]!) {
+  uploadMultipleFiles(files: $files) {
+    filename
+    mimetype
+    encoding
+    url
+  }
+}
+
+# Create user with avatar
+mutation CreateUser($name: String!, $email: String!, $avatar: Upload) {
+  createUser(name: $name, email: $email, avatar: $avatar) {
+    id
+    name
+    email
+    avatar
+  }
+}

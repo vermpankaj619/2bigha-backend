@@ -1,0 +1,267 @@
+# Property Approval System Queries
+
+# ===== ADMIN QUERIES =====
+
+# Get properties pending approval
+query GetPendingApprovalProperties($limit: Int, $offset: Int) {
+  pendingApprovalProperties(limit: $limit, offset: $offset) {
+    id
+    title
+    propertyType
+    listingType
+    price
+    city
+    state
+    approvalStatus
+    verificationStatus
+    createdAt
+    agent {
+      id
+      firstName
+      lastName
+      email
+    }
+    images {
+      id
+      imageUrl
+      isMain
+    }
+  }
+}
+
+# Get properties by approval status
+query GetPropertiesByApprovalStatus($status: ApprovalStatus!, $limit: Int, $offset: Int) {
+  propertiesByApprovalStatus(status: $status, limit: $limit, offset: $offset) {
+    id
+    title
+    propertyType
+    price
+    approvalStatus
+    approvalMessage
+    approvedAt
+    rejectedAt
+    approvedBy {
+      id
+      firstName
+      lastName
+    }
+    rejectedBy {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+# Get property approval history
+query GetPropertyApprovalHistory($propertyId: ID!, $limit: Int, $offset: Int) {
+  propertyApprovalHistory(propertyId: $propertyId, limit: $limit, offset: $offset) {
+    id
+    action
+    previousStatus
+    newStatus
+    message
+    adminNotes
+    reason
+    createdAt
+    admin {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+}
+
+# Get approval statistics
+query GetApprovalStatistics {
+  approvalStatistics {
+    approval {
+      status
+      count
+    }
+    verification {
+      status
+      count
+    }
+  }
+}
+
+# ===== USER QUERIES =====
+
+# Get approval notifications for user
+query GetApprovalNotifications($userId: ID!, $limit: Int, $offset: Int) {
+  approvalNotifications(userId: $userId, limit: $limit, offset: $offset) {
+    id
+    type
+    title
+    message
+    isRead
+    priority
+    createdAt
+    property {
+      id
+      title
+      propertyType
+    }
+    admin {
+      firstName
+      lastName
+    }
+  }
+}
+
+# Get unread approval notifications
+query GetUnreadApprovalNotifications($userId: ID!) {
+  unreadApprovalNotifications(userId: $userId) {
+    id
+    type
+    title
+    message
+    priority
+    createdAt
+    property {
+      id
+      title
+    }
+  }
+}
+
+# ===== ADMIN MUTATIONS =====
+
+# Approve property
+mutation ApproveProperty($input: PropertyApprovalInput!) {
+  approveProperty(input: $input) {
+    id
+    title
+    approvalStatus
+    approvalMessage
+    approvedAt
+    approvedBy {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+# Reject property
+mutation RejectProperty($input: PropertyApprovalInput!) {
+  rejectProperty(input: $input) {
+    id
+    title
+    approvalStatus
+    approvalMessage
+    rejectionReason
+    rejectedAt
+    rejectedBy {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+# Verify property
+mutation VerifyProperty($input: PropertyApprovalInput!) {
+  verifyProperty(input: $input) {
+    id
+    title
+    verificationStatus
+    verificationMessage
+    verifiedAt
+    verifiedBy {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+# Unverify property
+mutation UnverifyProperty($input: PropertyApprovalInput!) {
+  unverifyProperty(input: $input) {
+    id
+    title
+    verificationStatus
+    verificationMessage
+    verifiedBy {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+# Flag property
+mutation FlagProperty($input: PropertyApprovalInput!) {
+  flagProperty(input: $input) {
+    id
+    title
+    verificationStatus
+    verificationMessage
+    lastReviewedBy {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+# ===== USER MUTATIONS =====
+
+# Mark notification as read
+mutation MarkApprovalNotificationAsRead($notificationId: ID!) {
+  markApprovalNotificationAsRead(notificationId: $notificationId) {
+    id
+    isRead
+    readAt
+  }
+}
+
+# Mark all notifications as read
+mutation MarkAllApprovalNotificationsAsRead($userId: ID!) {
+  markAllApprovalNotificationsAsRead(userId: $userId)
+}
+
+# ===== EXAMPLE VARIABLES =====
+
+# Variables for approving a property
+# {
+#   "input": {
+#     "propertyId": "123",
+#     "message": "Your property has been approved and is now live on our platform. Great listing!",
+#     "adminNotes": "Property verified through documents and site visit",
+#     "reason": "All requirements met"
+#   }
+# }
+
+# Variables for rejecting a property
+# {
+#   "input": {
+#     "propertyId": "124",
+#     "message": "Your property listing has been rejected. Please review the feedback and resubmit.",
+#     "adminNotes": "Missing required documents",
+#     "reason": "Incomplete documentation - missing ownership proof and recent photos"
+#   }
+# }
+
+# Variables for verifying a property
+# {
+#   "input": {
+#     "propertyId": "125",
+#     "message": "Your property has been verified as authentic and accurate.",
+#     "adminNotes": "Site visit completed, documents verified",
+#     "reason": "Physical verification completed successfully"
+#   }
+# }
+
+# Variables for flagging a property
+# {
+#   "input": {
+#     "propertyId": "126",
+#     "message": "Your property has been flagged for review due to reported issues.",
+#     "adminNotes": "Multiple user reports about misleading information",
+#     "reason": "User complaints about property condition mismatch"
+#   }
+# }

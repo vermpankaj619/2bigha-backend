@@ -1,0 +1,314 @@
+# Get all blog posts with filters
+query GetBlogPosts($filters: BlogPostFilters, $limit: Int, $offset: Int, $sort: BlogSort) {
+  blogPosts(filters: $filters, limit: $limit, offset: $offset, sort: $sort) {
+    id
+    uuid
+    title
+    slug
+    excerpt
+    content
+    featuredImage
+    status
+    tags
+    seoTitle
+    seoDescription
+    publishedAt
+    createdAt
+    updatedAt
+    wordCount
+    readingTime
+    author {
+      id
+      firstName
+      lastName
+      email
+      avatar
+    }
+    categories {
+      id
+      name
+      slug
+      color
+    }
+  }
+}
+
+# Get single blog post
+query GetBlogPost($id: ID, $slug: String, $uuid: String) {
+  blogPost(id: $id, slug: $slug, uuid: $uuid) {
+    id
+    uuid
+    title
+    slug
+    excerpt
+    content
+    featuredImage
+    status
+    tags
+    seoTitle
+    seoDescription
+    publishedAt
+    createdAt
+    updatedAt
+    wordCount
+    readingTime
+    author {
+      id
+      firstName
+      lastName
+      email
+      avatar
+    }
+    categories {
+      id
+      name
+      slug
+      description
+      color
+    }
+  }
+}
+
+# Get published blog posts (public)
+query GetPublishedBlogPosts($limit: Int, $offset: Int) {
+  publishedBlogPosts(limit: $limit, offset: $offset) {
+    id
+    title
+    slug
+    excerpt
+    featuredImage
+    tags
+    publishedAt
+    wordCount
+    readingTime
+    author {
+      firstName
+      lastName
+    }
+    categories {
+      name
+      slug
+      color
+    }
+  }
+}
+
+# Search blog posts
+query SearchBlogPosts($query: String!, $limit: Int) {
+  searchBlogPosts(query: $query, limit: $limit) {
+    id
+    title
+    slug
+    excerpt
+    featuredImage
+    publishedAt
+    author {
+      firstName
+      lastName
+    }
+  }
+}
+
+# Get blog categories
+query GetBlogCategories {
+  blogCategories {
+    id
+    name
+    slug
+    description
+    color
+    postCount
+    createdAt
+  }
+}
+
+# Get blog statistics
+query GetBlogStats {
+  blogStats {
+    totalPosts
+    publishedPosts
+    draftPosts
+    archivedPosts
+    totalCategories
+    postsThisMonth
+    postsThisWeek
+  }
+}
+
+# Generate SEO suggestions
+query GenerateBlogSEO($title: String!, $content: String!) {
+  generateBlogSEO(title: $title, content: $content) {
+    suggestedTitle
+    suggestedDescription
+    suggestedTags
+    readabilityScore
+    seoScore
+    recommendations
+  }
+}
+
+# Create blog post
+mutation CreateBlogPost($input: CreateBlogPostInput!) {
+  createBlogPost(input: $input) {
+    id
+    uuid
+    title
+    slug
+    status
+    createdAt
+    author {
+      firstName
+      lastName
+    }
+  }
+}
+
+# Update blog post
+mutation UpdateBlogPost($id: ID!, $input: UpdateBlogPostInput!) {
+  updateBlogPost(id: $id, input: $input) {
+    id
+    title
+    slug
+    status
+    updatedAt
+  }
+}
+
+# Publish blog post
+mutation PublishBlogPost($id: ID!) {
+  publishBlogPost(id: $id) {
+    id
+    title
+    status
+    publishedAt
+  }
+}
+
+# Unpublish blog post
+mutation UnpublishBlogPost($id: ID!) {
+  unpublishBlogPost(id: $id) {
+    id
+    title
+    status
+    publishedAt
+  }
+}
+
+# Archive blog post
+mutation ArchiveBlogPost($id: ID!) {
+  archiveBlogPost(id: $id) {
+    id
+    title
+    status
+    updatedAt
+  }
+}
+
+# Update SEO
+mutation UpdateBlogPostSEO($id: ID!, $input: BlogSEOInput!) {
+  updateBlogPostSEO(id: $id, input: $input) {
+    id
+    title
+    seoTitle
+    seoDescription
+    updatedAt
+  }
+}
+
+# Upload featured image
+mutation UploadBlogFeaturedImage($id: ID!, $file: Upload!) {
+  uploadBlogFeaturedImage(id: $id, file: $file) {
+    id
+    title
+    featuredImage
+    updatedAt
+  }
+}
+
+# Remove featured image
+mutation RemoveBlogFeaturedImage($id: ID!) {
+  removeBlogFeaturedImage(id: $id) {
+    id
+    title
+    featuredImage
+    updatedAt
+  }
+}
+
+# Generate unique slug
+mutation GenerateBlogPostSlug($title: String!, $excludeId: ID) {
+  generateBlogPostSlug(title: $title, excludeId: $excludeId)
+}
+
+# Create blog category
+mutation CreateBlogCategory($input: CreateBlogCategoryInput!) {
+  createBlogCategory(input: $input) {
+    id
+    name
+    slug
+    description
+    color
+    createdAt
+  }
+}
+
+# Update blog category
+mutation UpdateBlogCategory($id: ID!, $input: UpdateBlogCategoryInput!) {
+  updateBlogCategory(id: $id, input: $input) {
+    id
+    name
+    slug
+    description
+    color
+    updatedAt
+  }
+}
+
+# Delete blog category
+mutation DeleteBlogCategory($id: ID!) {
+  deleteBlogCategory(id: $id)
+}
+
+# Delete blog post
+mutation DeleteBlogPost($id: ID!) {
+  deleteBlogPost(id: $id)
+}
+
+# Bulk operations
+mutation BulkUpdateBlogPostStatus($postIds: [ID!]!, $status: BlogStatus!) {
+  bulkUpdateBlogPostStatus(postIds: $postIds, status: $status)
+}
+
+mutation BulkDeleteBlogPosts($postIds: [ID!]!) {
+  bulkDeleteBlogPosts(postIds: $postIds)
+}
+
+# Example variables for creating a blog post
+# {
+#   "input": {
+#     "title": "Complete Guide to Real Estate Investment in 2024",
+#     "excerpt": "Learn the fundamentals of real estate investment with our comprehensive guide covering market analysis, financing options, and investment strategies.",
+#     "content": "Real estate investment has become one of the most popular ways to build wealth...",
+#     "status": "DRAFT",
+#     "tags": ["real-estate", "investment", "property", "finance"],
+#     "categoryIds": ["1", "2"],
+#     "seoTitle": "Real Estate Investment Guide 2024 - Complete Beginner's Guide",
+#     "seoDescription": "Master real estate investment with our 2024 guide. Learn market analysis, financing, and proven strategies to build wealth through property investment."
+#   }
+# }
+
+# Example variables for filtering blog posts
+# {
+#   "filters": {
+#     "status": "PUBLISHED",
+#     "search": "real estate",
+#     "categoryId": "1",
+#     "authorId": "2"
+#   },
+#   "limit": 10,
+#   "offset": 0,
+#   "sort": {
+#     "field": "PUBLISHED_AT",
+#     "direction": "DESC"
+#   }
+# }
