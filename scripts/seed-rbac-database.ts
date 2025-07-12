@@ -2,8 +2,10 @@ import { db, sql, testConnection } from "../src/database/connection"
 import * as schema from "../src/database/schema/index"
 import bcrypt from 'bcryptjs';
 import { randomUUID } from "crypto"
+import dotenv from 'dotenv'
 
 async function seedAdminUsersWithLogs() {
+  dotenv.config()
   console.log("🌱 Seeding Admin Users with UUID and Activity Logs...")
 
   try {
@@ -571,7 +573,7 @@ async function seedAdminUsersWithLogs() {
       .values([
         {
           id: randomUUID(),
-          email: "superadmin@realestate.com",
+          email: "superadmin@2bigha.ai",
           firstName: "System",
           lastName: "Administrator",
           password: hashedPassword,
@@ -586,7 +588,7 @@ async function seedAdminUsersWithLogs() {
         },
         {
           id: randomUUID(),
-          email: "property.manager@realestate.com",
+          email: "property.manager@2bigha.ai",
           firstName: "Rajesh",
           lastName: "Kumar",
           password: hashedPassword,
@@ -601,7 +603,7 @@ async function seedAdminUsersWithLogs() {
         },
         {
           id: randomUUID(),
-          email: "content.manager@realestate.com",
+          email: "content.manager@2bigha.ai",
           firstName: "Priya",
           lastName: "Sharma",
           password: hashedPassword,
@@ -616,7 +618,7 @@ async function seedAdminUsersWithLogs() {
         },
         {
           id: randomUUID(),
-          email: "analytics@realestate.com",
+          email: "analytics@2bigha.ai",
           firstName: "Amit",
           lastName: "Singh",
           password: hashedPassword,
@@ -631,7 +633,7 @@ async function seedAdminUsersWithLogs() {
         },
         {
           id: randomUUID(),
-          email: "support@realestate.com",
+          email: "support@2bigha.ai",
           firstName: "Neha",
           lastName: "Gupta",
           password: hashedPassword,
@@ -646,7 +648,7 @@ async function seedAdminUsersWithLogs() {
         },
         {
           id: randomUUID(),
-          email: "operations@realestate.com",
+          email: "operations@2bigha.ai",
           firstName: "Vikram",
           lastName: "Patel",
           password: hashedPassword,
@@ -661,7 +663,7 @@ async function seedAdminUsersWithLogs() {
         },
         {
           id: randomUUID(),
-          email: "seo@realestate.com",
+          email: "seo@2bigha.ai",
           firstName: "Kavya",
           lastName: "Reddy",
           password: hashedPassword,
@@ -764,7 +766,7 @@ async function seedAdminUsersWithLogs() {
         resource: "admin",
         resourceId: adminUsers[6].id,
         details: {
-          adminEmail: "seo@realestate.com",
+          adminEmail: "seo@2bigha.ai",
           role: "SEO Specialist",
           department: "Digital Marketing",
         },
@@ -1089,13 +1091,13 @@ async function seedAdminUsersWithLogs() {
 - OTP Tokens: 3 (2FA, password reset, email verification)
 
 🔐 Admin login credentials (password: Admin@123):
-- superadmin@realestate.com (Super Administrator)
-- property.manager@realestate.com (Property Manager)
-- content.manager@realestate.com (Content Manager)
-- analytics@realestate.com (Analytics Manager)
-- support@realestate.com (Support Manager)
-- operations@realestate.com (Operations Manager)
-- seo@realestate.com (SEO Specialist)
+- superadmin@2bigha.ai (Super Administrator)
+- property.manager@2bigha.ai (Property Manager)
+- content.manager@2bigha.ai (Content Manager)
+- analytics@2bigha.ai (Analytics Manager)
+- support@2bigha.ai (Support Manager)
+- operations@2bigha.ai (Operations Manager)
+- seo@2bigha.ai (SEO Specialist)
 
 📈 Activity Log Categories:
 - System Operations: Login, backup, maintenance
