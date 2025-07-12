@@ -1,6 +1,6 @@
 import { db, sql, testConnection } from "../src/database/connection"
 import * as schema from "../src/database/schema/index"
-import bcrypt from "bcrypt"
+import bcrypt from 'bcryptjs';
 import { randomUUID } from "crypto"
 
 async function seedAdminUsersWithLogs() {

@@ -1,7 +1,7 @@
 import { eq, and, or, like, sql, inArray, desc, asc } from "drizzle-orm"
 import { db } from "../../database/connection"
 import * as schema from "../../database/schema/index"
-import bcrypt from "bcrypt"
+import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from "uuid"
 
 const { adminUsers, adminRoles, adminPermissions, adminRolePermissions, adminUserRoles, adminActivityLogs } = schema

@@ -30,10 +30,9 @@
     "test:twilio": "tsx scripts/test-twilio-sms.ts",
     "validate:twilio": "tsx scripts/validate-twilio-config.ts",
     "test:email": "tsx scripts/test-azure-email.ts",
-     "test:approval": "tsx scripts/test-property-approval-notifications.ts",
+    "test:approval": "tsx scripts/test-property-approval-notifications.ts",
     "test:platform": "tsx scripts/test-platform-user-apis.ts",
-"test:profile-update": "tsx scripts/test-profile-update-apis.ts",
-    
+    "test:profile-update": "tsx scripts/test-profile-update-apis.ts",
     "start:platform": "ts-node-dev --respawn --transpile-only src/platform-user-server.ts"
   },
   "keywords": [
@@ -55,6 +54,7 @@
     "@graphql-tools/merge": "^9.0.24",
     "@graphql-tools/schema": "^10.0.23",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

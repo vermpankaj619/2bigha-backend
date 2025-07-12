@@ -1,6 +1,6 @@
 import { db } from "../src/database/connection"
 import { platformUsers, platformUserProfiles } from "../src/database/schema/platform-user"
-import bcrypt from "bcrypt"
+import bcrypt from 'bcryptjs';
 import { faker } from '@faker-js/faker';
 async function seedPlatformUsers() {
     console.log("🌱 Starting platform users seeding...")

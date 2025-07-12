@@ -1,7 +1,7 @@
 import { eq, and, or, like, sql, gt } from "drizzle-orm"
 import { db } from "../database/connection"
 import * as schema from "../database/schema/index"
-import bcrypt from "bcrypt"
+import bcrypt from 'bcryptjs';
 import crypto from "crypto"
 
 

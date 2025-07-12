@@ -1,7 +1,7 @@
 import { eq, and, sql, gt } from "drizzle-orm"
 import { db } from "../../database/connection"
 import * as schema from "../../database/schema/index"
-import bcrypt from "bcrypt"
+import bcrypt from 'bcryptjs';
 import { createSession, getSession, deleteSession } from "../../config/auth"
 import { logInfo, logError } from "../../utils/logger"
 import crypto from "crypto"
