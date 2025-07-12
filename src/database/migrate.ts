@@ -1,10 +1,10 @@
 import { migrate } from "drizzle-orm/postgres-js/migrator"
 import { db, sql } from "./connection"
 
-
+import dotenv from 'dotenv'
 async function runMigrations() {
   console.log("🚀 Running database migrations...")
-
+  dotenv.config()
   try {
     await migrate(db, { migrationsFolder: "./drizzle" })
     console.log("✅ Migrations completed successfully")
