@@ -616,3 +616,11 @@
 {"level":"info","message":"Phone OTP requested","phone":"917000379913","service":"real-estate-api","timestamp":"2025-07-12T16:07:39.574Z"}
 {"level":"info","message":"Phone OTP verified successfully","phone":"917000379913","service":"real-estate-api","timestamp":"2025-07-12T16:07:58.524Z","userId":"234d769e-9ec3-4b90-a154-0483356ce3a6"}
 {"level":"info","message":"Phone OTP verified successfully","phone":"917000379913","service":"real-estate-api","timestamp":"2025-07-12T16:07:58.529Z","userId":"234d769e-9ec3-4b90-a154-0483356ce3a6"}
+{"adminId":"db225556-5202-43e7-89a9-65fa8462b487","level":"info","message":"Admin activity logged: login","resourceId":"db225556-5202-43e7-89a9-65fa8462b487","resourceType":"admin_auth","service":"real-estate-api","timestamp":"2025-07-12T16:47:34.215Z"}
+{"level":"info","message":"Property 8b17b764-18e6-4fc3-938d-77088179748c verified by admin db225556-5202-43e7-89a9-65fa8462b487","service":"real-estate-api","timestamp":"2025-07-12T16:47:54.104Z"}
+{"level":"info","message":"Generic SMS sent successfully","messageSid":"SMb8d268a62ab83b3755613f83a679d357","service":"real-estate-api","status":"queued","timestamp":"2025-07-12T16:48:07.973Z","to":"917000379913"}
+{"action":"VERIFY","emailSent":true,"errorCount":0,"level":"info","message":"Property notification sent","propertyId":"8b17b764-18e6-4fc3-938d-77088179748c","service":"real-estate-api","smsSent":true,"timestamp":"2025-07-12T16:48:07.975Z"}
+{"level":"info","message":"Property 35d23443-1607-43c7-acaa-5ba82da672e9 approved by admin db225556-5202-43e7-89a9-65fa8462b487","service":"real-estate-api","timestamp":"2025-07-12T16:49:31.690Z"}
+{"adminId":"db225556-5202-43e7-89a9-65fa8462b487","level":"info","message":"Property approved with notifications","propertyId":"35d23443-1607-43c7-acaa-5ba82da672e9","service":"real-estate-api","timestamp":"2025-07-12T16:49:31.697Z"}
+{"level":"info","message":"Generic SMS sent successfully","messageSid":"SM9c90f2f018437d2d12e2ba7d58122ecc","service":"real-estate-api","status":"queued","timestamp":"2025-07-12T16:49:39.407Z","to":"917000379913"}
+{"action":"APPROVE","emailSent":true,"errorCount":0,"level":"info","message":"Property notification sent","propertyId":"35d23443-1607-43c7-acaa-5ba82da672e9","service":"real-estate-api","smsSent":true,"timestamp":"2025-07-12T16:49:39.408Z"}

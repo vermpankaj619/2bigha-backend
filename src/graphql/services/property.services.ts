@@ -194,7 +194,7 @@ export class PropertyService {
                 .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
                 .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
                 .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
-                // .where(eq(properties.approvalStatus, "APPROVED"))
+                .where(eq(properties.approvalStatus, "APPROVED"))
                 .groupBy(properties.id, platformUsers.id, propertySeo.id)
 
                 .orderBy(desc(properties.createdAt)) // or `desc(properties.views)` if you have views

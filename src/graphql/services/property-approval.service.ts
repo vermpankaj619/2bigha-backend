@@ -148,6 +148,7 @@ export class PropertyApprovalService {
                 approvalMessage: message,
                 approvedBy: adminId.toString(),
                 approvedAt: new Date(),
+                isVerified: true,
                 lastReviewedBy: adminId.toString(),
                 lastReviewedAt: new Date(),
                 adminNotes: adminNotes || property.adminNotes,
