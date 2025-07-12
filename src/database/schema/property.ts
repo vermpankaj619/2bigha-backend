@@ -65,14 +65,13 @@ export const areaUnitEnum = pgEnum("area_unit", [
 export const listingAsEnum = pgEnum("listing_as", [
   "OWNER",
   "AGENT",
-
-
 ])
 
 export const approvalStatusEnum = pgEnum("approval_status", [
   "PENDING",
   "APPROVED",
   "FLAGGED",
+  "REJECTED",
 ])
 
 
@@ -87,7 +86,7 @@ const geometry = customType<{ data: string }>({
 // Properties table - Enhanced with all UI fields
 export const properties = pgTable("properties", {
   id: uuid("id").defaultRandom().primaryKey(),
-  uuid: text("uuid").notNull().default("uuid_generate_v4()"),
+
   title: text("title").notNull(),
   description: text("description"),
   propertyType: propertyTypeEnum("property_type").notNull(),

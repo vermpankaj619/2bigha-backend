@@ -25,7 +25,16 @@
     "migration:generate": "tsx scripts/generate-migration.ts",
     "logs:clear": "rm -rf logs/*.log",
     "docker:build": "docker build -t real-estate-api .",
-    "docker:run": "docker run -p 4000:4000 real-estate-api"
+    "docker:run": "docker run -p 4000:4000 real-estate-api",
+    "validate:config": "tsx scripts/test-azure-email.ts",
+    "test:twilio": "tsx scripts/test-twilio-sms.ts",
+    "validate:twilio": "tsx scripts/validate-twilio-config.ts",
+    "test:email": "tsx scripts/test-azure-email.ts",
+     "test:approval": "tsx scripts/test-property-approval-notifications.ts",
+    "test:platform": "tsx scripts/test-platform-user-apis.ts",
+"test:profile-update": "tsx scripts/test-profile-update-apis.ts",
+    
+    "start:platform": "ts-node-dev --respawn --transpile-only src/platform-user-server.ts"
   },
   "keywords": [
     "graphql",
@@ -40,6 +49,8 @@
   "license": "MIT",
   "dependencies": {
     "@apollo/server": "^4.12.2",
+    "@azure/communication-email": "^1.0.0",
+    "@azure/communication-sms": "1.2.0-beta.4",
     "@azure/storage-blob": "^12.17.0",
     "@graphql-tools/merge": "^9.0.24",
     "@graphql-tools/schema": "^10.0.23",
@@ -49,8 +60,10 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "from": "^0.1.7",
+    "google-auth-library": "^10.1.0",
     "graphql": "^16.11.0",
     "graphql-constraint-directive": "^6.0.0",
+    "graphql-request": "^7.2.0",
     "graphql-upload": "12.0.0",
     "graphql-upload-minimal": "^1.6.1",
     "import": "^0.0.6",
@@ -59,6 +72,8 @@
     "pg": "^8.16.3",
     "postgres": "^3.4.3",
     "sharp": "^0.32.6",
+    "ts-node": "^10.9.2",
+    "twilio": "^5.7.1",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "zod": "^3.22.4"

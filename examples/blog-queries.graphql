@@ -286,14 +286,14 @@ mutation BulkDeleteBlogPosts($postIds: [ID!]!) {
 # Example variables for creating a blog post
 # {
 #   "input": {
-#     "title": "Complete Guide to Real Estate Investment in 2024",
-#     "excerpt": "Learn the fundamentals of real estate investment with our comprehensive guide covering market analysis, financing options, and investment strategies.",
-#     "content": "Real estate investment has become one of the most popular ways to build wealth...",
+#     "title": "Complete Guide to 2bigha Investment in 2024",
+#     "excerpt": "Learn the fundamentals of 2bigha investment with our comprehensive guide covering market analysis, financing options, and investment strategies.",
+#     "content": "2bigha investment has become one of the most popular ways to build wealth...",
 #     "status": "DRAFT",
 #     "tags": ["real-estate", "investment", "property", "finance"],
 #     "categoryIds": ["1", "2"],
-#     "seoTitle": "Real Estate Investment Guide 2024 - Complete Beginner's Guide",
-#     "seoDescription": "Master real estate investment with our 2024 guide. Learn market analysis, financing, and proven strategies to build wealth through property investment."
+#     "seoTitle": "2bigha Investment Guide 2024 - Complete Beginner's Guide",
+#     "seoDescription": "Master 2bigha investment with our 2024 guide. Learn market analysis, financing, and proven strategies to build wealth through property investment."
 #   }
 # }
 

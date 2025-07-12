@@ -843,7 +843,7 @@ async function seedAdminUsersWithLogs() {
         resourceId: randomUUID(),
         details: {
           blogTitle: "10 Essential Tips for First-Time Home Buyers in 2024",
-          category: "Real Estate Tips",
+          category: "2bigha Tips",
           wordCount: 3500,
           readingTime: "12 minutes",
         },
@@ -871,7 +871,7 @@ async function seedAdminUsersWithLogs() {
         resource: "blog",
         resourceId: randomUUID(),
         details: {
-          blogTitle: "Real Estate Market Trends: What to Expect in 2024",
+          blogTitle: "2bigha Market Trends: What to Expect in 2024",
           category: "Market Analysis",
           scheduledFor: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
           wordCount: 4200,
@@ -1000,7 +1000,7 @@ async function seedAdminUsersWithLogs() {
         resource: "seo",
         resourceId: null,
         details: {
-          targetKeywords: ["luxury villas gurgaon", "commercial property noida", "real estate investment"],
+          targetKeywords: ["luxury villas gurgaon", "commercial property noida", "2bigha investment"],
           competitorAnalysis: true,
           searchVolume: "high",
           difficulty: "medium",

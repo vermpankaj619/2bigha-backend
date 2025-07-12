@@ -114,6 +114,8 @@ export class AzureStorageService {
   async uploadFile(file: File, folder = "properties"): Promise<UploadResult[]> {
     const { filename, mimetype, encoding, createReadStream } = file
 
+
+
     const validation = this.validateImageFile(file)
     if (!validation.valid) {
       throw new Error(validation.error)
@@ -218,6 +220,7 @@ export class AzureStorageService {
 
 
   // Bulk upload multiple files with progress tracking
+  // Bulk upload multiple files with progress tracking
   async uploadBulkFiles(files: FileUpload[], folder = "properties"): Promise<BulkUploadResult> {
     const results: UploadResult[] = []
     const errors: string[] = []
@@ -226,9 +229,27 @@ export class AzureStorageService {
 
     console.log(`🚀 Starting bulk upload of ${files.length} files...`)
 
+    // 🧹 Filter out invalid entries
+    files = files.filter((f) => {
+      const isValid = f && f.file && typeof f.file.filename === "string"
+      if (!isValid) {
+        console.warn("⚠️ Skipping invalid file entry:", f)
+      }
+      return isValid
+    })
 
-    // Process files in parallel with concurrency limit
-    const concurrencyLimit = 3 // Process 3 files at a time
+    if (files.length === 0) {
+      return {
+        success: false,
+        results: [],
+        errors: ["No valid files provided for upload."],
+        totalUploaded: 0,
+        totalFailed: 0,
+      }
+    }
+
+    // Process files in chunks
+    const concurrencyLimit = 3
     const chunks = []
 
     for (let i = 0; i < files.length; i += concurrencyLimit) {
@@ -237,24 +258,23 @@ export class AzureStorageService {
 
     for (const chunk of chunks) {
       const promises = chunk.map(async (file, index) => {
-
+        const filename = file?.file?.filename || "unknown"
         try {
-          console.log(`📤 Uploading file ${index + 1}: ${file.file.filename}`)
+          console.log(`📤 Uploading file: ${filename}`)
           const fileResults = await this.uploadFile(file.file, folder)
           results.push(...fileResults)
           totalUploaded++
-          console.log(`✅ Successfully uploaded: ${file.file.filename}`)
-          return { success: true, filename: file.file.filename }
+          console.log(`✅ Successfully uploaded: ${filename}`)
+          return { success: true, filename }
         } catch (error) {
-          const errorMessage = `Failed to upload ${file.file}: ${error}`
+          const errorMessage = `Failed to upload ${filename}: ${error instanceof Error ? error.message : String(error)}`
           errors.push(errorMessage)
           totalFailed++
           console.error(`❌ ${errorMessage}`)
-          return { success: false, filename: file.file, error: errorMessage }
+          return { success: false, filename, error: errorMessage }
         }
       })
 
-      // Wait for current chunk to complete
       await Promise.all(promises)
     }
 
@@ -270,6 +290,7 @@ export class AzureStorageService {
     return bulkResult
   }
 
+
   // Upload multiple files (legacy method for backward compatibility)
   async uploadMultipleFiles(files: FileUpload[], folder = "properties"): Promise<UploadResult[][]> {
     const bulkResult = await this.uploadBulkFiles(files, folder)
@@ -282,6 +303,7 @@ export class AzureStorageService {
     const groupedResults: UploadResult[][] = []
     const fileNames = [...new Set(files.map((f) => f.file.filename))]
 
+    console.log(`📂 Grouping results by original file names: ${fileNames.join(", ")}`)
     for (const fileName of fileNames) {
       const fileResults = bulkResult.results.filter((r) => r.originalName === fileName)
       groupedResults.push(fileResults)

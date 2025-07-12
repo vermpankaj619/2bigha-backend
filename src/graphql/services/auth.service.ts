@@ -48,7 +48,7 @@ export class AdminAuthService {
             .innerJoin(adminRoles, eq(adminUserRoles.roleId, adminRoles.id))
             .where(eq(adminUserRoles.userId, adminId))
 
-        console.log(roles, "roels")
+
 
         // Get all permissions for this admin
         const permissions = await db
@@ -64,7 +64,6 @@ export class AdminAuthService {
             .innerJoin(adminPermissions, eq(adminRolePermissions.permissionId, adminPermissions.id))
             .where(eq(adminUserRoles.userId, adminId))
 
-        console.log(permissions)
         return {
             admin,
             roles,

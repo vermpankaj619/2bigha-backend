@@ -6,7 +6,6 @@ export const platformUserRoleEnum = pgEnum("platform_user_roles", ["OWNER", "AGE
 // Platform users table - Regular users of the platform
 export const platformUsers = pgTable("platform_users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  uuid: text("uuid").notNull().default("uuid_generate_v4()"),
   email: text("email").notNull().unique(),
   firstName: text("first_name"),
   lastName: text("last_name"),
@@ -17,11 +16,7 @@ export const platformUsers = pgTable("platform_users", {
   emailVerifiedAt: timestamp("email_verified_at"),
   lastLoginAt: timestamp("last_login_at"),
   twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
-  // Agent/Owner specific fields
-  licenseNumber: text("license_number"), // For agents
-  companyName: text("company_name"), // For agents/owners
-  businessType: text("business_type"), // individual, company, etc.
-  taxId: text("tax_id"), // For business users
+
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })

@@ -45,8 +45,8 @@ type Seo {
   seoTitle: String!
   seoDescription: String!
   seoKeywords: String!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 type Verification {
@@ -104,9 +104,9 @@ type Property {
   pinCode: String
   latLng: String
   location: location
-  boundary: String
+  boundary: JSON
   calculatedArea: Float
-  geoJson: String
+  geoJson: JSON
   createdByType: CreatedByType!
   images: [Image!]!
   videos: String
@@ -119,8 +119,8 @@ type Property {
   isActive: Boolean!
   viewCount: Int!
   inquiryCount: Int!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: Date!
+  updatedAt: Date!
   publishedAt: String
   createdByAdminId: ID
   createdByUserId: ID
@@ -136,11 +136,18 @@ type Property {
   lastReviewedAt: String
  
 }
+type propertyUser {
+  firstName: String
+   lastName: String
+   email: String
+ role: String
+}
 type properties {
   seo: Seo
   verification: Verification
   property: Property
   images: [PropertyImage]
+  user: propertyUser
 }
 
 
@@ -195,6 +202,8 @@ input LocationInput {
   city: String
   pincode: String
   address: String
+  lat: String
+  lng: String
 }
 
 input PropertyDetailsSchemaInput {
@@ -364,8 +373,24 @@ enum PropertyStatus {
     lng: Float!
   }
 
+input GetPropertiesInput {
+  page: Int!
+  limit: Int!
+}
   # Property Queries
- 
+ type PaginationMeta {
+  page: Int
+  limit: Int
+  total: Int
+  totalPages: Int
+}
+
+
+type PaginatedProperties {
+  data: [properties !]!
+  meta: PaginationMeta
+}
+
 
 
 
@@ -404,8 +429,11 @@ enum PropertyStatus {
     TITLE
   }
 
+
  extend type Query {
-    properties: [properties!]!
+    properties(input: GetPropertiesInput!): PaginatedProperties
+    getPendingApprovalProperties(input: GetPropertiesInput!): PaginatedProperties
+   
     # property(id: ID, uuid: String, slug: String): Property
     # featuredProperties(limit: Int): [Property!]!
     # nearbyProperties(latitude: Float!, longitude: Float!, radius: Float!, limit: Int): [Property!]!

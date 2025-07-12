@@ -127,7 +127,7 @@ async function seedPlatformUsers() {
                 updatedAt: new Date("2024-01-18T15:30:00Z"),
             },
 
-            // Real Estate Agents
+            // 2bigha Agents
             {
                 id: userIds.deepakAgent,
                 uuid: crypto.randomUUID(),
@@ -202,7 +202,7 @@ async function seedPlatformUsers() {
                 lastLoginAt: new Date("2024-01-21T10:30:00Z"),
                 twoFactorEnabled: false,
                 licenseNumber: "REA/DL/2023/1004",
-                companyName: "Neha Real Estate Consultancy",
+                companyName: "Neha 2bigha Consultancy",
                 businessType: "individual",
                 taxId: "07CDEFG3456H9I3",
                 createdAt: new Date("2024-01-11T15:20:00Z"),
@@ -462,11 +462,11 @@ async function seedPlatformUsers() {
                 updatedAt: new Date("2024-01-18T15:30:00Z"),
             },
 
-            // Real Estate Agent Profiles
+            // 2bigha Agent Profiles
             {
                 id: crypto.randomUUID(),
                 userId: userIds.deepakAgent,
-                bio: "Licensed real estate agent with 15+ years of experience in residential properties. Specializing in first-time home buyers and family homes in NCR.",
+                bio: "Licensed 2bigha agent with 15+ years of experience in residential properties. Specializing in first-time home buyers and family homes in NCR.",
                 avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face",
                 phone: "+91-9876543215",
                 address: "Sector 14, Gurgaon",
@@ -497,7 +497,7 @@ async function seedPlatformUsers() {
             {
                 id: crypto.randomUUID(),
                 userId: userIds.kavitaAgent,
-                bio: "Commercial real estate specialist with expertise in office spaces, retail outlets, and business investments. 12 years of proven track record.",
+                bio: "Commercial 2bigha specialist with expertise in office spaces, retail outlets, and business investments. 12 years of proven track record.",
                 avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face",
                 phone: "+91-9876543216",
                 address: "Cyber City, Gurgaon",
@@ -557,7 +557,7 @@ async function seedPlatformUsers() {
             {
                 id: crypto.randomUUID(),
                 userId: userIds.nehaAgent,
-                bio: "Dedicated real estate consultant specializing in helping first-time home buyers navigate the property market. Known for patient guidance and transparent dealings.",
+                bio: "Dedicated 2bigha consultant specializing in helping first-time home buyers navigate the property market. Known for patient guidance and transparent dealings.",
                 avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face",
                 phone: "+91-9876543218",
                 address: "Sector 29, Gurgaon",
@@ -587,7 +587,7 @@ async function seedPlatformUsers() {
             {
                 id: crypto.randomUUID(),
                 userId: userIds.sanjayAgent,
-                bio: "Senior real estate professional with 20+ years of experience in property investments, portfolio management, and wealth creation through real estate.",
+                bio: "Senior 2bigha professional with 20+ years of experience in property investments, portfolio management, and wealth creation through real estate.",
                 avatar: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150&h=150&fit=crop&crop=face",
                 phone: "+91-9876543219",
                 address: "Connaught Place, New Delhi",
@@ -695,7 +695,7 @@ async function seedPlatformUsers() {
             {
                 id: crypto.randomUUID(),
                 userId: userIds.karanUser,
-                bio: "Luxury car dealer interested in premium properties and high-end real estate investments. Looking for exclusive properties in prime locations.",
+                bio: "Luxury car dealer interested in premium properties and high-end 2bigha investments. Looking for exclusive properties in prime locations.",
                 avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
                 phone: "+91-9876543224",
                 address: "Bandra West, Mumbai",
@@ -717,7 +717,7 @@ async function seedPlatformUsers() {
         console.log("🎉 Platform users seeding completed!")
         console.log("\n📊 Seeded Data Summary:")
         console.log("- Property Owners: 5 users")
-        console.log("- Real Estate Agents: 5 users")
+        console.log("- 2bigha Agents: 5 users")
         console.log("- Regular Users: 5 users")
         console.log("- Total Users: 15 users")
         console.log("- Verified Users: 12 users")
@@ -726,7 +726,7 @@ async function seedPlatformUsers() {
         console.log("Password for all users: User@123")
         console.log("\n📧 Sample Login Emails:")
         console.log("- rajesh.kumar@email.com (Property Owner)")
-        console.log("- deepak@deepakrealty.com (Real Estate Agent)")
+        console.log("- deepak@deepakrealty.com (2bigha Agent)")
         console.log("- ankit.verma@email.com (Regular User)")
 
         // Export user IDs for use in other seed files

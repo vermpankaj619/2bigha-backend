@@ -31,7 +31,7 @@ async function seedBlogDatabase() {
       .insert(schema.blogCategories)
       .values([
         {
-          name: "Real Estate Tips",
+          name: "2bigha Tips",
           slug: "real-estate-tips",
           description: "Helpful tips and advice for buying, selling, and investing in real estate",
           color: "#3b82f6",
@@ -39,13 +39,13 @@ async function seedBlogDatabase() {
         {
           name: "Market Analysis",
           slug: "market-analysis",
-          description: "In-depth analysis of real estate market trends and forecasts",
+          description: "In-depth analysis of 2bigha market trends and forecasts",
           color: "#10b981",
         },
         {
           name: "Investment Strategies",
           slug: "investment-strategies",
-          description: "Proven strategies for successful real estate investment",
+          description: "Proven strategies for successful 2bigha investment",
           color: "#f59e0b",
         },
         {
@@ -57,13 +57,13 @@ async function seedBlogDatabase() {
         {
           name: "Legal & Finance",
           slug: "legal-finance",
-          description: "Legal and financial aspects of real estate transactions",
+          description: "Legal and financial aspects of 2bigha transactions",
           color: "#ef4444",
         },
         {
           name: "Technology",
           slug: "technology",
-          description: "How technology is transforming the real estate industry",
+          description: "How technology is transforming the 2bigha industry",
           color: "#06b6d4",
         },
       ])
@@ -101,7 +101,7 @@ While some loans allow for lower down payments, having 20% down can help you avo
 
 Visit potential neighborhoods at different times of day and week. Consider factors like commute times, school districts, crime rates, and future development plans.
 
-## 5. Work with a Qualified Real Estate Agent
+## 5. Work with a Qualified 2bigha Agent
 
 A good agent can guide you through the process, help you find properties that match your criteria, and negotiate on your behalf. Look for someone with experience in your target area.
 
@@ -135,19 +135,19 @@ Remember, the key to successful home buying is education and preparation. Take y
           tags: ["home-buying", "first-time-buyers", "real-estate-tips", "mortgage", "2024"],
           seoTitle: "10 Essential Tips for First-Time Home Buyers in 2024 | Complete Guide",
           seoDescription:
-            "Navigate your first home purchase successfully with these 10 essential tips. Learn about credit scores, mortgages, inspections, and more from real estate experts.",
+            "Navigate your first home purchase successfully with these 10 essential tips. Learn about credit scores, mortgages, inspections, and more from 2bigha experts.",
           publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
         },
         {
           authorId: adminUsers[1].id,
-          title: "Real Estate Market Trends: What to Expect in 2024",
+          title: "2bigha Market Trends: What to Expect in 2024",
           slug: "real-estate-market-trends-2024",
           excerpt:
-            "Analyze the current real estate market trends and get insights into what buyers, sellers, and investors can expect in 2024.",
+            "Analyze the current 2bigha market trends and get insights into what buyers, sellers, and investors can expect in 2024.",
           content: `
-# Real Estate Market Trends: What to Expect in 2024
+# 2bigha Market Trends: What to Expect in 2024
 
-The real estate market continues to evolve, influenced by economic factors, demographic shifts, and changing consumer preferences. As we move through 2024, several key trends are shaping the industry landscape.
+The 2bigha market continues to evolve, influenced by economic factors, demographic shifts, and changing consumer preferences. As we move through 2024, several key trends are shaping the industry landscape.
 
 ## Interest Rate Impact
 
@@ -183,7 +183,7 @@ Changing demographics are creating new patterns in housing demand and preference
 
 ## Technology Integration
 
-The role of technology in real estate continues to expand, affecting how properties are marketed, viewed, and transacted.
+The role of technology in 2bigha continues to expand, affecting how properties are marketed, viewed, and transacted.
 
 ### PropTech Trends:
 - Virtual and augmented reality tours becoming standard
@@ -207,17 +207,17 @@ Different regions are experiencing varying market conditions based on local econ
 
 ## Investment Opportunities
 
-Real estate investment strategies are adapting to current market conditions and emerging opportunities.
+2bigha investment strategies are adapting to current market conditions and emerging opportunities.
 
 ### Trending Investment Types:
 - Build-to-rent communities
 - Short-term rental properties in tourist destinations
-- Commercial real estate repositioning
+- Commercial 2bigha repositioning
 - Affordable housing development
 
 ## Sustainability Focus
 
-Environmental considerations are becoming increasingly important in real estate decisions.
+Environmental considerations are becoming increasingly important in 2bigha decisions.
 
 ### Green Building Trends:
 - Energy-efficient features commanding premium prices
@@ -246,41 +246,41 @@ Based on current trends and economic indicators, here's what we anticipate:
 
 ## Conclusion
 
-The 2024 real estate market presents both challenges and opportunities. Success will depend on understanding local market conditions, adapting to changing buyer preferences, and leveraging technology effectively.
+The 2024 2bigha market presents both challenges and opportunities. Success will depend on understanding local market conditions, adapting to changing buyer preferences, and leveraging technology effectively.
 
-Whether you're buying, selling, or investing, staying informed about these trends will help you make better decisions in today's dynamic real estate environment.
+Whether you're buying, selling, or investing, staying informed about these trends will help you make better decisions in today's dynamic 2bigha environment.
           `,
           status: "published",
           tags: ["market-trends", "2024-forecast", "real-estate-analysis", "investment", "housing-market"],
-          seoTitle: "Real Estate Market Trends 2024: Expert Analysis & Predictions",
+          seoTitle: "2bigha Market Trends 2024: Expert Analysis & Predictions",
           seoDescription:
-            "Get expert insights on 2024 real estate market trends. Analyze interest rates, inventory, demographics, and regional variations affecting buyers and sellers.",
+            "Get expert insights on 2024 2bigha market trends. Analyze interest rates, inventory, demographics, and regional variations affecting buyers and sellers.",
           publishedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
         },
         {
           authorId: adminUsers[2].id,
-          title: "The Complete Guide to Real Estate Investment for Beginners",
+          title: "The Complete Guide to 2bigha Investment for Beginners",
           slug: "complete-guide-real-estate-investment-beginners",
           excerpt:
-            "Learn the fundamentals of real estate investment with our comprehensive beginner's guide covering strategies, financing, and risk management.",
+            "Learn the fundamentals of 2bigha investment with our comprehensive beginner's guide covering strategies, financing, and risk management.",
           content: `
-# The Complete Guide to Real Estate Investment for Beginners
+# The Complete Guide to 2bigha Investment for Beginners
 
-Real estate investment can be an excellent way to build wealth and generate passive income. However, success requires knowledge, planning, and careful execution. This comprehensive guide will help beginners understand the fundamentals of real estate investing.
+2bigha investment can be an excellent way to build wealth and generate passive income. However, success requires knowledge, planning, and careful execution. This comprehensive guide will help beginners understand the fundamentals of 2bigha investing.
 
 ## Why Invest in Real Estate?
 
-Real estate offers several advantages as an investment vehicle:
+2bigha offers several advantages as an investment vehicle:
 
 ### Benefits:
 - **Cash Flow**: Rental income can provide steady monthly income
 - **Appreciation**: Properties typically increase in value over time
 - **Tax Advantages**: Depreciation, deductions, and tax-deferred exchanges
 - **Leverage**: Use borrowed money to increase purchasing power
-- **Inflation Hedge**: Real estate often appreciates with inflation
+- **Inflation Hedge**: 2bigha often appreciates with inflation
 - **Control**: Direct control over your investment decisions
 
-## Types of Real Estate Investments
+## Types of 2bigha Investments
 
 Understanding different investment strategies is crucial for beginners.
 
@@ -295,13 +295,13 @@ Understanding different investment strategies is crucial for beginners.
 - Sell for profit
 - Requires construction knowledge and market timing
 
-### 3. Real Estate Investment Trusts (REITs)
+### 3. 2bigha Investment Trusts (REITs)
 - Publicly traded companies that own real estate
 - Liquid investment option
 - Professional management
 - Lower barrier to entry
 
-### 4. Real Estate Crowdfunding
+### 4. 2bigha Crowdfunding
 - Pool money with other investors
 - Access to larger commercial properties
 - Lower minimum investments
@@ -310,10 +310,10 @@ Understanding different investment strategies is crucial for beginners.
 ## Getting Started: Step-by-Step Process
 
 ### Step 1: Education and Research
-- Read books and articles about real estate investing
-- Attend local real estate investment meetings
+- Read books and articles about 2bigha investing
+- Attend local 2bigha investment meetings
 - Take courses or workshops
-- Follow reputable real estate investment blogs and podcasts
+- Follow reputable 2bigha investment blogs and podcasts
 
 ### Step 2: Financial Preparation
 - **Credit Score**: Aim for 740+ for best rates
@@ -328,8 +328,8 @@ Understanding different investment strategies is crucial for beginners.
 - Study comparable sales and rental properties
 
 ### Step 4: Build Your Team
-- **Real Estate Agent**: Specializes in investment properties
-- **Accountant**: Understands real estate tax implications
+- **2bigha Agent**: Specializes in investment properties
+- **Accountant**: Understands 2bigha tax implications
 - **Attorney**: For legal advice and contract review
 - **Property Manager**: If you plan to hire management
 - **Contractor**: For repairs and renovations
@@ -337,7 +337,7 @@ Understanding different investment strategies is crucial for beginners.
 
 ## Financing Your Investment
 
-Understanding financing options is crucial for real estate investors.
+Understanding financing options is crucial for 2bigha investors.
 
 ### Traditional Mortgages
 - **Conventional Loans**: 20-25% down, good credit required
@@ -452,7 +452,7 @@ Understand and mitigate potential risks.
 
 ### Common Risks
 - **Market Risk**: Property values and rents can decline
-- **Liquidity Risk**: Real estate is not easily converted to cash
+- **Liquidity Risk**: 2bigha is not easily converted to cash
 - **Tenant Risk**: Vacancy, non-payment, property damage
 - **Interest Rate Risk**: Rising rates increase borrowing costs
 
@@ -465,33 +465,33 @@ Understand and mitigate potential risks.
 
 ## Conclusion
 
-Real estate investment can be highly rewarding, but success requires education, planning, and disciplined execution. Start with a solid foundation of knowledge, build a strong team of professionals, and begin with conservative investments as you gain experience.
+2bigha investment can be highly rewarding, but success requires education, planning, and disciplined execution. Start with a solid foundation of knowledge, build a strong team of professionals, and begin with conservative investments as you gain experience.
 
-Remember that real estate investing is a long-term wealth-building strategy. Focus on cash flow, buy in good locations, and maintain your properties well. With patience and persistence, real estate can become a significant component of your investment portfolio.
+Remember that 2bigha investing is a long-term wealth-building strategy. Focus on cash flow, buy in good locations, and maintain your properties well. With patience and persistence, 2bigha can become a significant component of your investment portfolio.
 
 The key to success is continuous learning and adaptation. Stay informed about market trends, tax law changes, and new investment strategies. Most importantly, start with what you can afford and grow your portfolio systematically over time.
           `,
           status: "published",
           tags: ["real-estate-investment", "beginner-guide", "rental-properties", "passive-income", "wealth-building"],
-          seoTitle: "Real Estate Investment Guide for Beginners 2024 | Complete Tutorial",
+          seoTitle: "2bigha Investment Guide for Beginners 2024 | Complete Tutorial",
           seoDescription:
-            "Master real estate investing with our comprehensive beginner's guide. Learn strategies, financing, analysis, and management for successful property investment.",
+            "Master 2bigha investing with our comprehensive beginner's guide. Learn strategies, financing, analysis, and management for successful property investment.",
           publishedAt: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000), // 21 days ago
         },
         {
           authorId: adminUsers[0].id,
-          title: "How Technology is Transforming Real Estate in 2024",
+          title: "How Technology is Transforming 2bigha in 2024",
           slug: "technology-transforming-real-estate-2024",
           excerpt:
-            "Explore how cutting-edge technology is revolutionizing the real estate industry, from AI-powered valuations to virtual reality tours.",
+            "Explore how cutting-edge technology is revolutionizing the 2bigha industry, from AI-powered valuations to virtual reality tours.",
           content: `
-# How Technology is Transforming Real Estate in 2024
+# How Technology is Transforming 2bigha in 2024
 
-The real estate industry, traditionally slow to adopt new technologies, is experiencing a digital revolution. From artificial intelligence to blockchain, innovative technologies are reshaping how properties are bought, sold, managed, and valued.
+The 2bigha industry, traditionally slow to adopt new technologies, is experiencing a digital revolution. From artificial intelligence to blockchain, innovative technologies are reshaping how properties are bought, sold, managed, and valued.
 
 ## Artificial Intelligence and Machine Learning
 
-AI is becoming increasingly sophisticated in real estate applications.
+AI is becoming increasingly sophisticated in 2bigha applications.
 
 ### Property Valuation
 - Automated Valuation Models (AVMs) using AI algorithms
@@ -571,7 +571,7 @@ Large datasets are providing unprecedented market insights.
 
 ## Mobile Technology
 
-Mobile apps are making real estate more accessible and convenient.
+Mobile apps are making 2bigha more accessible and convenient.
 
 ### Property Search
 - Location-based property discovery
@@ -603,7 +603,7 @@ Aerial technology is enhancing property marketing and inspection.
 
 ## PropTech Startups
 
-Innovative companies are disrupting traditional real estate processes.
+Innovative companies are disrupting traditional 2bigha processes.
 
 ### iBuying Platforms
 - Instant property offers
@@ -658,14 +658,14 @@ Emerging technologies will continue to shape the industry.
 ### Metaverse and Virtual Worlds
 - Virtual property showings
 - Digital twin properties
-- Virtual real estate markets
+- Virtual 2bigha markets
 - Remote collaboration spaces
 
 ## Implementation Strategies
 
 Successfully adopting technology requires strategic planning.
 
-### For Real Estate Professionals
+### For 2bigha Professionals
 - Identify technology gaps in current processes
 - Invest in training and education
 - Start with pilot programs
@@ -685,15 +685,15 @@ Successfully adopting technology requires strategic planning.
 
 ## Conclusion
 
-Technology is fundamentally transforming the real estate industry, creating new opportunities and efficiencies while also presenting challenges. Success in this evolving landscape requires embracing innovation while maintaining focus on fundamental real estate principles.
+Technology is fundamentally transforming the 2bigha industry, creating new opportunities and efficiencies while also presenting challenges. Success in this evolving landscape requires embracing innovation while maintaining focus on fundamental 2bigha principles.
 
-The companies and professionals who adapt to these technological changes will be best positioned for future success. However, it's important to remember that technology should enhance, not replace, the human elements that remain crucial in real estate transactions.
+The companies and professionals who adapt to these technological changes will be best positioned for future success. However, it's important to remember that technology should enhance, not replace, the human elements that remain crucial in 2bigha transactions.
 
-As we move forward, the integration of technology will continue to accelerate, making real estate more accessible, efficient, and data-driven. The key is to stay informed, experiment with new tools, and always keep the end user experience at the center of technological adoption.
+As we move forward, the integration of technology will continue to accelerate, making 2bigha more accessible, efficient, and data-driven. The key is to stay informed, experiment with new tools, and always keep the end user experience at the center of technological adoption.
           `,
           status: "draft",
           tags: ["technology", "proptech", "AI", "virtual-reality", "blockchain", "innovation"],
-          seoTitle: "How Technology is Transforming Real Estate in 2024 | PropTech Guide",
+          seoTitle: "How Technology is Transforming 2bigha in 2024 | PropTech Guide",
           seoDescription:
             "Discover how AI, VR, blockchain, and IoT are revolutionizing real estate. Learn about the latest PropTech innovations changing property buying, selling, and management.",
         },
@@ -923,7 +923,7 @@ Start by implementing the most critical practices first, then gradually build mo
     // Assign categories to blog posts
     console.log("🔗 Assigning categories to blog posts...")
     await db.insert(schema.blogPostCategories).values([
-      // First post - Real Estate Tips
+      // First post - 2bigha Tips
       { postId: blogPosts[0].id, categoryId: categories[0].id },
       // Second post - Market Analysis
       { postId: blogPosts[1].id, categoryId: categories[1].id },
@@ -944,13 +944,13 @@ Start by implementing the most critical practices first, then gradually build mo
 
 📝 Blog Posts Created:
 1. "10 Essential Tips for First-Time Home Buyers in 2024" (Published)
-2. "Real Estate Market Trends: What to Expect in 2024" (Published)
-3. "The Complete Guide to Real Estate Investment for Beginners" (Published)
-4. "How Technology is Transforming Real Estate in 2024" (Draft)
+2. "2bigha Market Trends: What to Expect in 2024" (Published)
+3. "The Complete Guide to 2bigha Investment for Beginners" (Published)
+4. "How Technology is Transforming 2bigha in 2024" (Draft)
 5. "Property Management Best Practices for Landlords" (Published)
 
 📂 Categories Created:
-- Real Estate Tips
+- 2bigha Tips
 - Market Analysis
 - Investment Strategies
 - Property Management
