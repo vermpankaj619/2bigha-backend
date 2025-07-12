@@ -1,8 +1,9 @@
 import { sql } from "../src/database/connection"
-
+import dotenv from 'dotenv'
 async function generateMigration() {
   console.log("🚀 Generating database migration...")
 
+  dotenv.config()
   try {
     // Enable required extensions
     console.log("📍 Enabling database extensions...")
