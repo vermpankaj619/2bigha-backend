@@ -2,6 +2,7 @@ import { sql } from "../src/database/connection"
 import dotenv from 'dotenv'
 async function generateMigration() {
   console.log("🚀 Generating database migration...")
+  console.log(process.env.DATABASE_URL)
 
   dotenv.config()
   try {
