@@ -90,7 +90,12 @@ export class AzureStorageService {
     }
   }
 
-
+  private sanitizeMetadataValue(value: string): string {
+    return value
+      .replace(/[^\x20-\x7E]/g, "")     // remove non-ASCII
+      .replace(/[^\w\-_.]/g, "_")       // replace special chars
+      .substring(0, 128);               // Azure metadata limit
+  }
 
   // Validate image file
   private validateImageFile(file: File): { valid: boolean; error?: string } {
@@ -112,53 +117,52 @@ export class AzureStorageService {
   // Upload single file with multiple variants
   // Upload single file with multiple WebP variants
   async uploadFile(file: File, folder = "properties"): Promise<UploadResult[]> {
-    const { filename, mimetype, encoding, createReadStream } = file
+    const { filename, mimetype, encoding, createReadStream } = file;
 
-
-
-    const validation = this.validateImageFile(file)
+    const validation = this.validateImageFile(file);
     if (!validation.valid) {
-      throw new Error(validation.error)
+      throw new Error(validation.error);
     }
 
-    const stream = createReadStream()
-    const chunks: Buffer[] = []
+    const stream = createReadStream();
+    const chunks: Buffer[] = [];
 
     for await (const chunk of stream) {
-      chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk)
+      chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
     }
 
-    const buffer = Buffer.concat(chunks)
-    const originalSize = buffer.length
-    const maxSize = 10 * 1024 * 1024 // 10MB
+    const buffer = Buffer.concat(chunks);
+    const originalSize = buffer.length;
+    const maxSize = 10 * 1024 * 1024; // 10MB
 
     if (originalSize > maxSize) {
-      throw new Error("File size exceeds 10MB limit")
+      throw new Error("File size exceeds 10MB limit");
     }
 
-    const results: UploadResult[] = []
+    const results: UploadResult[] = [];
 
-    // Generate base filename once
-    const timestamp = Date.now()
-    const uuid = uuidv4().substring(0, 8)
-    const extension = "webp"
-    const baseName = filename.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9]/g, "-")
-    const baseFilename = `${baseName}-${timestamp}-${uuid}`
+    const timestamp = Date.now();
+    const uuid = uuidv4().substring(0, 8);
+    const extension = "webp";
+    const baseName = filename
+      .replace(/\.[^/.]+$/, "")
+      .replace(/[^a-zA-Z0-9-_]/g, "-"); // Slugify base name
+    const baseFilename = `${baseName}-${timestamp}-${uuid}`;
 
     for (const variant of AzureStorageService.IMAGE_VARIANTS) {
       try {
-        let processedBuffer: Buffer
-        let width: number
-        let height: number
+        let processedBuffer: Buffer;
+        let width: number;
+        let height: number;
 
         if (variant.name === "original") {
           const processed = await sharp(buffer)
             .webp({ quality: variant.quality })
-            .toBuffer({ resolveWithObject: true })
+            .toBuffer({ resolveWithObject: true });
 
-          processedBuffer = processed.data
-          width = processed.info.width
-          height = processed.info.height
+          processedBuffer = processed.data;
+          width = processed.info.width;
+          height = processed.info.height;
         } else {
           const processed = await sharp(buffer)
             .resize(variant.width, variant.height, {
@@ -166,34 +170,33 @@ export class AzureStorageService {
               withoutEnlargement: true,
             })
             .webp({ quality: variant.quality })
-            .toBuffer({ resolveWithObject: true })
+            .toBuffer({ resolveWithObject: true });
 
-          processedBuffer = processed.data
-          width = processed.info.width
-          height = processed.info.height
+          processedBuffer = processed.data;
+          width = processed.info.width;
+          height = processed.info.height;
         }
 
-        // Construct consistent variant filename
-        const variantFilename = `${baseFilename}-${variant.name}.${extension}`
-        const blobPath = `${folder}/${variantFilename}`
+        const variantFilename = `${baseFilename}-${variant.name}.${extension}`;
+        const blobPath = `${folder}/${variantFilename}`;
 
-        const blockBlobClient: BlockBlobClient = this.containerClient.getBlockBlobClient(blobPath)
+        const blockBlobClient: BlockBlobClient = this.containerClient.getBlockBlobClient(blobPath);
 
         await blockBlobClient.uploadData(processedBuffer, {
           blobHTTPHeaders: {
             blobContentType: "image/webp",
-            blobCacheControl: "public, max-age=31536000", // 1 year cache
+            blobCacheControl: "public, max-age=31536000",
           },
           metadata: {
-            originalName: filename,
-            variant: variant.name,
-            uploadedAt: new Date().toISOString(),
+            originalname: this.sanitizeMetadataValue(filename),
+            variant: this.sanitizeMetadataValue(variant.name),
+            uploadedat: new Date().toISOString().replace(/[^0-9T:.Z]/g, "_"),
             width: width.toString(),
             height: height.toString(),
           },
-        })
+        });
 
-        const url = `${this.baseUrl}/${this.containerName}/${blobPath}`
+        const url = `${this.baseUrl}/${this.containerName}/${blobPath}`;
 
         results.push({
           filename: baseFilename,
@@ -205,17 +208,18 @@ export class AzureStorageService {
           width,
           height,
           variant: variant.name,
-        })
+        });
 
-        console.log(`✅ Uploaded ${variant.name} variant: ${variantFilename}`)
+        console.log(`✅ Uploaded ${variant.name} variant: ${variantFilename}`);
       } catch (error) {
-        console.error(`❌ Failed to upload ${variant.name} variant:`, error)
-        throw new Error(`Failed to upload ${variant.name} variant: ${error}`)
+        console.error(`❌ Failed to upload ${variant.name} variant:`, error);
+        throw new Error(`Failed to upload ${variant.name} variant: ${error}`);
       }
     }
 
-    return results
+    return results;
   }
+
 
 
 
