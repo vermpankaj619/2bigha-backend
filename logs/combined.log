@@ -624,3 +624,8 @@
 {"adminId":"db225556-5202-43e7-89a9-65fa8462b487","level":"info","message":"Property approved with notifications","propertyId":"35d23443-1607-43c7-acaa-5ba82da672e9","service":"real-estate-api","timestamp":"2025-07-12T16:49:31.697Z"}
 {"level":"info","message":"Generic SMS sent successfully","messageSid":"SM9c90f2f018437d2d12e2ba7d58122ecc","service":"real-estate-api","status":"queued","timestamp":"2025-07-12T16:49:39.407Z","to":"917000379913"}
 {"action":"APPROVE","emailSent":true,"errorCount":0,"level":"info","message":"Property notification sent","propertyId":"35d23443-1607-43c7-acaa-5ba82da672e9","service":"real-estate-api","smsSent":true,"timestamp":"2025-07-12T16:49:39.408Z"}
+{"level":"info","message":"SMS OTP sent successfully","messageSid":"SMd152e78fdf57866cbee2f041557a2464","phoneNumber":"917000379913","service":"real-estate-api","status":"queued","timestamp":"2025-07-13T17:00:26.450Z"}
+{"level":"info","message":"Phone OTP sent","phone":"917000379913","service":"real-estate-api","smsSent":true,"timestamp":"2025-07-13T17:00:26.451Z","userId":"79aca665-a2d3-4a84-8806-b873ce2e8fe9"}
+{"level":"info","message":"Phone OTP requested","phone":"917000379913","service":"real-estate-api","timestamp":"2025-07-13T17:00:26.452Z"}
+{"level":"info","message":"Phone OTP verified successfully","phone":"917000379913","service":"real-estate-api","timestamp":"2025-07-13T17:00:40.678Z","userId":"79aca665-a2d3-4a84-8806-b873ce2e8fe9"}
+{"level":"info","message":"Phone OTP verified successfully","phone":"917000379913","service":"real-estate-api","timestamp":"2025-07-13T17:00:40.681Z","userId":"79aca665-a2d3-4a84-8806-b873ce2e8fe9"}
