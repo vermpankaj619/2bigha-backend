@@ -730,6 +730,7 @@ export const platformUserResolvers = {
 
                 return property;
             } catch (error) {
+                console.log(error)
                 console.error("Create property error:", error);
                 throw new GraphQLError("Failed to create property", {
                     extensions: { code: "INTERNAL_ERROR" },
