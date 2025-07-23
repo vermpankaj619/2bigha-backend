@@ -283,13 +283,20 @@ export class PropertyService {
                     COALESCE(json_agg(${propertyImages}.*) 
                     FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
                 `.as("images"),
-                    user: platformUsers,
+                    user: {
+                        firstName: platformUsers?.firstName,
+                        lastName: platformUsers?.lastName,
+                        email: platformUsers?.email,
+                        role: platformUsers?.role,
+                        phone: platformUserProfiles?.phone
+                    }
                 })
                 .from(properties)
                 .innerJoin(
                     propertyVerification,
                     eq(properties.id, propertyVerification.propertyId)
                 )
+
 
                 .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
                 .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
@@ -299,11 +306,17 @@ export class PropertyService {
                     platformUsers,
                     eq(properties.createdByUserId, platformUsers.id)
                 )
+
+                .leftJoin(
+                    platformUserProfiles,
+                    eq(platformUserProfiles.userId, platformUsers.id)
+                )
                 .groupBy(
                     properties.id,
                     propertySeo.id,
                     propertyVerification.id,
-                    platformUsers.id
+                    platformUsers.id,
+                    platformUserProfiles.id
                 )
                 .orderBy(desc(properties.createdAt))
                 .limit(limit)

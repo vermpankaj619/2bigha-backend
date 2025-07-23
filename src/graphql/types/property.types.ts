@@ -141,6 +141,7 @@ type propertyUser {
    lastName: String
    email: String
  role: String
+ phone: String
 }
 type properties {
   seo: Seo

@@ -34,6 +34,8 @@ export const propertyResolvers = {
                 input.limit
             );
 
+            console.log(results)
+
             return results;
         },
 
