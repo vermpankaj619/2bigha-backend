@@ -76,65 +76,62 @@ export class PropertyService {
 
         try {
             // Upload images to Azure Storage
-            const bulkUploadResult = await azureStorage.uploadBulkFiles(
-                images,
-                "properties"
-            );
+            const bulkResult = await azureStorage.uploadBulkFiles(images, "properties");
 
-            if (!bulkUploadResult.success) {
-                console.log(error)
-                throw new Error(
-                    `Image upload failed: ${bulkUploadResult.errors.join(", ")}`
-                );
-            }
-
-            // Group results by original filename and create image data
             const imageDataArray: PropertyImageData[] = [];
             const processedFiles = new Set<string>();
 
-            console.log(bulkUploadResult, "sd");
+            if (!bulkResult.success && bulkResult.results.length === 0) {
+                console.error("❌ All image uploads failed.");
+                console.error("Errors:", bulkResult.errors);
+                return []; // or throw new Error("All uploads failed.") if you want to stop completely
+            }
 
-            for (const result of bulkUploadResult.results) {
-                if (!processedFiles.has(result.originalName)) {
-                    processedFiles.add(result.originalName);
-
-                    // Find metadata for this image
-                    const imageIndex = images.findIndex(
-                        (img) => img.file.filename === result.originalName
-                    );
-
-                    const imageMetadata = metadata[imageIndex] || {};
-
-                    // Get all variant URLs for this image
-                    const variants = azureStorage.getAllVariantUrls(
-                        result.filename,
-                        "properties"
-                    );
-
-                    // Use the large variant as the main URL
-                    const mainImageUrl = variants.large || variants.original;
-
-                    const imageData: PropertyImageData = {
-                        imageUrl: mainImageUrl,
-                        imageType: imageMetadata.imageType || "general",
-                        caption: imageMetadata.caption || "",
-                        altText: imageMetadata.altText || "",
-                        sortOrder: imageMetadata.sortOrder || 0,
-                        isMain: imageMetadata.isMain || false,
-                        variants,
-                    };
-
-                    imageDataArray.push(imageData);
+            for (const result of bulkResult.results) {
+                if (!result || !result.originalName || !result.filename) {
+                    console.warn("⚠️ Skipping invalid upload result:", result);
+                    continue;
                 }
+
+                if (processedFiles.has(result.originalName)) continue;
+                processedFiles.add(result.originalName);
+
+                // Find metadata for this image
+                const imageIndex = images.findIndex(
+                    (img) => img?.file?.filename === result.originalName
+                );
+
+                const imageMetadata = metadata[imageIndex] || {};
+
+                const variants = azureStorage.getAllVariantUrls(result.filename, "properties");
+                const mainImageUrl = variants.large || variants.original;
+
+                const imageData: PropertyImageData = {
+                    imageUrl: mainImageUrl,
+                    imageType: imageMetadata.imageType || "general",
+                    caption: imageMetadata.caption || "",
+                    altText: imageMetadata.altText || "",
+                    sortOrder: imageMetadata.sortOrder || 0,
+                    isMain: imageMetadata.isMain || false,
+                    variants,
+                };
+
+                imageDataArray.push(imageData);
             }
 
             console.log(`✅ Successfully processed ${imageDataArray.length} images`);
+            if (bulkResult.errors && bulkResult.errors.length > 0) {
+                console.warn(`⚠️ Some images failed to upload: ${bulkResult.errors.join(", ")}`);
+            }
+
+
             return imageDataArray;
         } catch (error) {
             console.error("❌ Failed to process property images:", error);
             throw new Error(`Image processing failed: ${error}`);
         }
     }
+
 
     static async getProperties(page: number, limit: number) {
         const offset = (page - 1) * limit;
@@ -250,15 +247,7 @@ export class PropertyService {
             .from(properties)
             .where(eq(properties.createdByUserId, userId));
 
-        console.log({
-            data: results,
-            meta: {
-                total: count,
-                page,
-                limit,
-                totalPages: Math.ceil(count / limit),
-            },
-        });
+
         return {
             data: results,
             meta: {
@@ -581,6 +570,7 @@ export class PropertyService {
             processedImages = await this.processPropertyImages(images);
         }
 
+
         const generateSeo = await SeoGenerator.generateSEOFields(
             propertyData.propertyDetailsSchema.propertyType,
             propertyData.location.city,
@@ -670,5 +660,7 @@ export class PropertyService {
         };
 
         return result;
+
+
     }
 }

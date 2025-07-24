@@ -1,7 +1,7 @@
 import { BlobServiceClient, type ContainerClient, type BlockBlobClient } from "@azure/storage-blob"
 import sharp from "sharp"
 import { v4 as uuidv4 } from "uuid"
-
+import imageCompression from "browser-image-compression"
 
 export interface FileUpload {
   file: File
@@ -231,16 +231,18 @@ export class AzureStorageService {
     let totalUploaded = 0
     let totalFailed = 0
 
+    // console.log(files, "files")
     console.log(`🚀 Starting bulk upload of ${files.length} files...`)
 
     // 🧹 Filter out invalid entries
-    files = files.filter((f) => {
-      const isValid = f && f.file && typeof f.file.filename === "string"
-      if (!isValid) {
-        console.warn("⚠️ Skipping invalid file entry:", f)
-      }
-      return isValid
-    })
+    // files = files.filter((f) => {
+    //   console.log(f)
+    //   const isValid = f && f.file && typeof f.file.filename === "string"
+    //   if (!isValid) {
+    //     console.warn("⚠️ Skipping invalid file entry:", f)
+    //   }
+    //   return isValid
+    // })
 
     if (files.length === 0) {
       return {
