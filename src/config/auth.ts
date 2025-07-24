@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import { v4 as uuidv4 } from "uuid"
 
 const JWT_SECRET: string = process.env.JWT_SECRET || "your-super-secret-jwt-key" as string;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h" as string;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24000000000000000h" as string;
 
 export interface SessionData {
   userId: string

@@ -2,9 +2,14 @@ import { BlobServiceClient, type ContainerClient, type BlockBlobClient } from "@
 import sharp from "sharp"
 import { v4 as uuidv4 } from "uuid"
 import imageCompression from "browser-image-compression"
-
+import path from "path";
+const watermarkPath = path.join(process.cwd(), "public", "logo-watermark.png");
+const padding = 20;
 export interface FileUpload {
-  file: File
+  filename: string
+  mimetype: string
+  encoding: string
+  createReadStream: () => NodeJS.ReadableStream
 }
 
 
@@ -155,15 +160,10 @@ export class AzureStorageService {
         let width: number;
         let height: number;
 
-        if (variant.name === "original") {
-          const processed = await sharp(buffer)
-            .webp({ quality: variant.quality })
-            .toBuffer({ resolveWithObject: true });
 
-          processedBuffer = processed.data;
-          width = processed.info.width;
-          height = processed.info.height;
-        } else {
+
+        if (variant.name === "thumbnail") {
+          // Skip watermark on thumbnail
           const processed = await sharp(buffer)
             .resize(variant.width, variant.height, {
               fit: "inside",
@@ -175,7 +175,39 @@ export class AzureStorageService {
           processedBuffer = processed.data;
           width = processed.info.width;
           height = processed.info.height;
+        } else {
+          // Add watermark for other variants
+          const resized = await sharp(buffer)
+            .resize(variant.width, variant.height, {
+              fit: "inside",
+              withoutEnlargement: true,
+            })
+            .toBuffer();
+
+          // Get dimensions of resized image and watermark
+          const imageMeta = await sharp(resized).metadata();
+          const logoMeta = await sharp(watermarkPath).metadata();
+
+          const left = (imageMeta.width ?? 0) - (logoMeta.width ?? 0) - padding;
+          const top = (imageMeta.height ?? 0) - (logoMeta.height ?? 0) - padding;
+
+          const processed = await sharp(resized)
+            .composite([
+              {
+                input: watermarkPath,
+                top,
+                left,
+                blend: "overlay",
+              },
+            ])
+            .webp({ quality: variant.quality })
+            .toBuffer({ resolveWithObject: true });
+
+          processedBuffer = processed.data;
+          width = processed.info.width;
+          height = processed.info.height;
         }
+
 
         const variantFilename = `${baseFilename}-${variant.name}.${extension}`;
         const blobPath = `${folder}/${variantFilename}`;
@@ -263,11 +295,12 @@ export class AzureStorageService {
     }
 
     for (const chunk of chunks) {
+      console.log(chunk)
       const promises = chunk.map(async (file, index) => {
-        const filename = file?.file?.filename || "unknown"
+        const filename = file?.filename || "unknown"
         try {
           console.log(`📤 Uploading file: ${filename}`)
-          const fileResults = await this.uploadFile(file.file, folder)
+          const fileResults = await this.uploadFile(file, folder)
           results.push(...fileResults)
           totalUploaded++
           console.log(`✅ Successfully uploaded: ${filename}`)
@@ -307,7 +340,7 @@ export class AzureStorageService {
 
     // Group results by original file
     const groupedResults: UploadResult[][] = []
-    const fileNames = [...new Set(files.map((f) => f.file.filename))]
+    const fileNames = [...new Set(files.map((f) => f.filename))]
 
     console.log(`📂 Grouping results by original file names: ${fileNames.join(", ")}`)
     for (const fileName of fileNames) {

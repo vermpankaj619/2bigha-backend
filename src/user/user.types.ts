@@ -270,7 +270,7 @@ input CreatePropertyInput {
   propertyDetailsSchema: PropertyDetailsSchemaInput
 
   images: [Upload!] # or define an ImageInput type if structure is available
-   map: MapInput
+  map: MapInput
 }
 
 

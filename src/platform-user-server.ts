@@ -47,7 +47,7 @@ const startServer = async () => {
     // ✅ Middleware order matters
     app.use(cors())
     app.use(express.json())
-    app.use(graphqlUploadExpress()) // before Apollo middleware
+    app.use(graphqlUploadExpress({ maxFileSize: 5 * 1024 * 1024, maxFiles: 6 }))
 
     app.use(
         '/graphql',
