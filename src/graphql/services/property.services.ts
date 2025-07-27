@@ -346,7 +346,23 @@ export class PropertyService {
 
             const property = await this.getPropertyById(seo.propertyId);
 
-            console.log(property);
+            if (property?.property?.createdByType === "ADMIN") {
+                let adminProperty = property;
+
+                const owner = {
+                    id: property?.property?.id,
+                    email: "info@2bigha.ai",
+                    firstName: property?.property?.ownerName,
+                    lastName: null,
+                    phone: property?.property?.ownerPhone,
+                };
+
+                adminProperty.owner = owner;
+
+                return adminProperty;
+            }
+
+            // console.log(property);
             return property;
         } catch (error) {
             console.error("❌ Failed to fetch property by slug:", error);
@@ -470,17 +486,30 @@ export class PropertyService {
 
         let processedImages: PropertyImageData[] = [];
         if (images && images.length > 0) {
-            const resolvedUploads = await Promise.all(
-                images.map((u: any) => Promise.resolve(u))
-            );
-            processedImages = await this.processPropertyImages(resolvedUploads);
+            if (images && images.length > 0) {
+                const resolvedUploads = await Promise.all(
+                    images.map(async (upload: any) => {
+                        return await upload.promise;
+                    })
+                );
+
+                processedImages = await this.processPropertyImages(resolvedUploads);
+
+                console.log("🖼️ Processed images:", processedImages);
+            }
         }
+
+        const generateSeo = await SeoGenerator.generateSEOFields(
+            propertyData.propertyDetailsSchema.propertyType,
+            propertyData.location.city,
+            propertyData.location.district
+        );
 
         await db.transaction(async (tx) => {
             await tx.insert(properties).values({
                 id: propertyId,
-                title: propertyData.seo.seoTitle,
-                description: propertyData.seo.metaDescription,
+                title: generateSeo?.title,
+                description: generateSeo?.seoDescription,
                 propertyType:
                     propertyData.propertyDetailsSchema.propertyType.toUpperCase(),
                 status: "PUBLISHED",
@@ -503,15 +532,15 @@ export class PropertyService {
                 publishedAt: new Date(),
                 createdByType: "ADMIN",
                 createdByAdminId: userID,
-                approvalStatus: "APPROVED",
+                approvalStatus: "PENDING",
             });
 
             await tx.insert(propertySeo).values({
                 propertyId,
-                slug: propertyData.seo.slug,
-                seoTitle: propertyData.seo.seoTitle,
-                seoDescription: propertyData.seo.metaDescription,
-                seoKeywords: propertyData.seo.keywords,
+                seoTitle: generateSeo.seoTitle,
+                seoDescription: generateSeo.seoDescription,
+                slug: generateSeo.slug,
+                seoKeywords: generateSeo.seoKeywords,
             });
             if (processedImages.length > 0) {
                 const imageInserts = processedImages.map((img, index) => ({
@@ -530,11 +559,8 @@ export class PropertyService {
 
             await tx.insert(propertyVerification).values({
                 propertyId,
-                isVerified: true, // Assuming property is verified on creation
-                verificationMessage: "Property approved and published",
-                verificationNotes: null,
-                verifiedBy: userID,
-                verifiedAt: new Date(),
+                isVerified: false, // Assuming property is verified on creation
+                verificationMessage: "Verification Pending",
             });
         });
 
@@ -581,9 +607,7 @@ export class PropertyService {
                     })
                 );
 
-                processedImages = await this.processPropertyImages(
-                    resolvedUploads
-                );
+                processedImages = await this.processPropertyImages(resolvedUploads);
 
                 console.log("🖼️ Processed images:", processedImages);
             }
@@ -595,8 +619,7 @@ export class PropertyService {
             propertyData.location.district
         );
 
-
-        console.log(processedImages)
+        console.log(processedImages);
 
         await db.transaction(async (tx) => {
             await tx.insert(properties).values({
@@ -608,7 +631,9 @@ export class PropertyService {
                 status: "PUBLISHED",
                 price: parseFloat(propertyData.propertyDetailsSchema.totalPrice),
                 area: parseFloat(propertyData.propertyDetailsSchema.area),
-                pricePerUnit: parseFloat(propertyData.propertyDetailsSchema.pricePerUnit),
+                pricePerUnit: parseFloat(
+                    propertyData.propertyDetailsSchema.pricePerUnit
+                ),
                 areaUnit: propertyData.propertyDetailsSchema.areaUnit.toUpperCase(),
                 khasraNumber: propertyData.propertyDetailsSchema.khasraNumber,
                 murabbaNumber: propertyData.propertyDetailsSchema.murabbaNumber,

@@ -357,17 +357,17 @@ export class RBACService {
             })
             .returning()
 
-        // Assign roles
-        if (input.roleIds && input.roleIds.length > 0) {
-            const userRoles = input.roleIds.map((roleId: string) => ({
-                id: uuidv4(),
-                userId: adminId,
-                roleId,
-                assignedBy: createdBy,
-            }))
 
-            await db.insert(adminUserRoles).values(userRoles)
-        }
+        // Assign roles
+
+
+        await db.insert(adminUserRoles).values({
+            id: uuidv4(),
+            userId: adminId,
+            roleId: input.roleId,
+            assignedBy: createdBy,
+        })
+
 
         // Log activity
         await this.logActivity(createdBy, "create_admin", "admin", adminId, {

@@ -182,8 +182,8 @@ type PaginationMeta {
   totalPages: Int
 }
 type owner {
-  id: ID
-  email: String
+
+
   firstName: String
   lastName: String
   phone: String

@@ -100,7 +100,7 @@ export class MapPropertiesService {
                 .orderBy(desc(properties.createdAt)) // or `desc(properties.views)` if you have views
                 .limit(limit);
 
-            console.log(results)
+
 
             return results
 

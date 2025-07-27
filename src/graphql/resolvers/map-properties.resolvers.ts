@@ -27,6 +27,7 @@ export const mapPropertiesResolvers = {
         mapProperties: async (_: any, { limit = 1000 }: { limit?: number }) => {
             try {
                 console.log(`🗺️ GraphQL: Fetching map properties with limit ${limit}`)
+
                 return await MapPropertiesService.getMapProperties()
             } catch (error) {
                 console.error("❌ GraphQL Error fetching map properties:", error)
