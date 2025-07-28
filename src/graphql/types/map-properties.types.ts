@@ -25,7 +25,7 @@ type PropertyImageVariants {
     areaUnit: AreaUnit!
     images: [PropertyImage!]!
     description: String
-
+   area: String
     daysOnMarket: Int
     status: String!
     location: JSON

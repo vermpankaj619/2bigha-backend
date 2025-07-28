@@ -203,8 +203,7 @@ input LocationInput {
   city: String
   pincode: String
   address: String
-  lat: String
-  lng: String
+
 }
 
 input PropertyDetailsSchemaInput {
@@ -260,12 +259,12 @@ input MapInput {
 scalar JSON
 
 input CreatePropertyInput {
-  seo: SeoInput
+
   location: LocationInput
   propertyDetailsSchema: PropertyDetailsSchemaInput
   contactDetails: ContactDetailsInput
   images: [Upload!] # or define an ImageInput type if structure is available
-   map: MapInput
+  map: MapInput
 }
 
 

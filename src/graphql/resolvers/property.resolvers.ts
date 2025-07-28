@@ -34,14 +34,10 @@ export const propertyResolvers = {
                 input.limit
             );
 
-            console.log(results)
+            console.log(results);
 
             return results;
         },
-
-
-
-
     },
 
     Mutation: {

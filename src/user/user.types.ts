@@ -182,8 +182,8 @@ type PaginationMeta {
   totalPages: Int
 }
 type owner {
-  id: ID
-  email: String
+
+
   firstName: String
   lastName: String
   phone: String
@@ -270,7 +270,7 @@ input CreatePropertyInput {
   propertyDetailsSchema: PropertyDetailsSchemaInput
 
   images: [Upload!] # or define an ImageInput type if structure is available
-   map: MapInput
+  map: MapInput
 }
 
 

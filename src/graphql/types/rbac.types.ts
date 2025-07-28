@@ -82,7 +82,8 @@ export const rbacTypeDefs = `#graphql
     department: String
     employeeId: String
     phone: String
-    roleIds: [ID!]!
+    roleId: ID!
+    bio: String
   }
 
   input UpdateAdminInput {

@@ -76,59 +76,62 @@ export class PropertyService {
 
         try {
             // Upload images to Azure Storage
-            const bulkUploadResult = await azureStorage.uploadBulkFiles(
+            const bulkResult = await azureStorage.uploadBulkFiles(
                 images,
                 "properties"
             );
 
-            if (!bulkUploadResult.success) {
-                console.log(error)
-                throw new Error(
-                    `Image upload failed: ${bulkUploadResult.errors.join(", ")}`
-                );
-            }
-
-            // Group results by original filename and create image data
             const imageDataArray: PropertyImageData[] = [];
             const processedFiles = new Set<string>();
 
-            console.log(bulkUploadResult, "sd");
+            if (!bulkResult.success && bulkResult.results.length === 0) {
+                console.error("❌ All image uploads failed.");
+                console.error("Errors:", bulkResult.errors);
+                return []; // or throw new Error("All uploads failed.") if you want to stop completely
+            }
 
-            for (const result of bulkUploadResult.results) {
-                if (!processedFiles.has(result.originalName)) {
-                    processedFiles.add(result.originalName);
-
-                    // Find metadata for this image
-                    const imageIndex = images.findIndex(
-                        (img) => img.file.filename === result.originalName
-                    );
-
-                    const imageMetadata = metadata[imageIndex] || {};
-
-                    // Get all variant URLs for this image
-                    const variants = azureStorage.getAllVariantUrls(
-                        result.filename,
-                        "properties"
-                    );
-
-                    // Use the large variant as the main URL
-                    const mainImageUrl = variants.large || variants.original;
-
-                    const imageData: PropertyImageData = {
-                        imageUrl: mainImageUrl,
-                        imageType: imageMetadata.imageType || "general",
-                        caption: imageMetadata.caption || "",
-                        altText: imageMetadata.altText || "",
-                        sortOrder: imageMetadata.sortOrder || 0,
-                        isMain: imageMetadata.isMain || false,
-                        variants,
-                    };
-
-                    imageDataArray.push(imageData);
+            for (const result of bulkResult.results) {
+                if (!result || !result.originalName || !result.filename) {
+                    console.warn("⚠️ Skipping invalid upload result:", result);
+                    continue;
                 }
+
+                if (processedFiles.has(result.originalName)) continue;
+                processedFiles.add(result.originalName);
+
+                // Find metadata for this image
+                const imageIndex = images.findIndex(
+                    (img) => img?.filename === result.originalName
+                );
+
+                const imageMetadata = metadata[imageIndex] || {};
+
+                const variants = azureStorage.getAllVariantUrls(
+                    result.filename,
+                    "properties"
+                );
+                const mainImageUrl = variants.large || variants.original;
+
+                const imageData: PropertyImageData = {
+                    imageUrl: mainImageUrl,
+                    imageType: imageMetadata.imageType || "general",
+                    caption: imageMetadata.caption || "",
+                    altText: imageMetadata.altText || "",
+                    sortOrder: imageMetadata.sortOrder || 0,
+                    isMain: imageMetadata.isMain || false,
+                    variants,
+                };
+
+                imageDataArray.push(imageData);
             }
 
             console.log(`✅ Successfully processed ${imageDataArray.length} images`);
+            if (bulkResult.errors && bulkResult.errors.length > 0) {
+                console.warn(
+                    `⚠️ Some images failed to upload: ${bulkResult.errors.join(", ")}`
+                );
+            }
+
             return imageDataArray;
         } catch (error) {
             console.error("❌ Failed to process property images:", error);
@@ -192,7 +195,10 @@ export class PropertyService {
                 })
                 .from(properties)
                 .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
-                .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+                .leftJoin(
+                    platformUsers,
+                    eq(properties.createdByUserId, platformUsers.id)
+                )
                 .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
                 .where(eq(properties.approvalStatus, "APPROVED"))
                 .groupBy(properties.id, platformUsers.id, propertySeo.id)
@@ -234,31 +240,16 @@ export class PropertyService {
             .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
 
             .where(eq(properties.createdByUserId, userId))
-            .groupBy(
-                properties.id,
-                propertySeo.id,
-
-            )
+            .groupBy(properties.id, propertySeo.id)
             .orderBy(desc(properties.createdAt))
             .limit(limit)
             .offset(offset);
-
-
 
         const [{ count }] = await db
             .select({ count: sql<number>`COUNT(*)` })
             .from(properties)
             .where(eq(properties.createdByUserId, userId));
 
-        console.log({
-            data: results,
-            meta: {
-                total: count,
-                page,
-                limit,
-                totalPages: Math.ceil(count / limit),
-            },
-        });
         return {
             data: results,
             meta: {
@@ -288,15 +279,14 @@ export class PropertyService {
                         lastName: platformUsers?.lastName,
                         email: platformUsers?.email,
                         role: platformUsers?.role,
-                        phone: platformUserProfiles?.phone
-                    }
+                        phone: platformUserProfiles?.phone,
+                    },
                 })
                 .from(properties)
                 .innerJoin(
                     propertyVerification,
                     eq(properties.id, propertyVerification.propertyId)
                 )
-
 
                 .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
                 .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
@@ -356,8 +346,24 @@ export class PropertyService {
 
             const property = await this.getPropertyById(seo.propertyId);
 
-            console.log(property)
-            return property
+            if (property?.property?.createdByType === "ADMIN") {
+                let adminProperty = property;
+
+                const owner = {
+                    id: property?.property?.id,
+                    email: "info@2bigha.ai",
+                    firstName: property?.property?.ownerName,
+                    lastName: null,
+                    phone: property?.property?.ownerPhone,
+                };
+
+                adminProperty.owner = owner;
+
+                return adminProperty;
+            }
+
+            // console.log(property);
+            return property;
         } catch (error) {
             console.error("❌ Failed to fetch property by slug:", error);
             throw new Error(`Failed to fetch property with slug "${slug}"`);
@@ -374,13 +380,18 @@ export class PropertyService {
                         firstName: platformUsers?.firstName,
                         lastName: platformUsers?.lastName,
                         phone: platformUserProfiles?.phone,
-                    }
+                    },
                 })
                 .from(properties)
-                .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
-                .leftJoin(platformUserProfiles, eq(platformUsers.id, platformUserProfiles.userId))
+                .leftJoin(
+                    platformUsers,
+                    eq(properties.createdByUserId, platformUsers.id)
+                )
+                .leftJoin(
+                    platformUserProfiles,
+                    eq(platformUsers.id, platformUserProfiles.userId)
+                )
                 .where(eq(properties.id, id));
-
 
             if (!property) {
                 throw new Error(`Property with ID ${id} not found`);
@@ -390,8 +401,6 @@ export class PropertyService {
                 .select()
                 .from(propertySeo)
                 .where(eq(propertySeo.propertyId, id));
-
-
 
             const images = await db
                 .select()
@@ -477,14 +486,30 @@ export class PropertyService {
 
         let processedImages: PropertyImageData[] = [];
         if (images && images.length > 0) {
-            processedImages = await this.processPropertyImages(images);
+            if (images && images.length > 0) {
+                const resolvedUploads = await Promise.all(
+                    images.map(async (upload: any) => {
+                        return await upload.promise;
+                    })
+                );
+
+                processedImages = await this.processPropertyImages(resolvedUploads);
+
+                console.log("🖼️ Processed images:", processedImages);
+            }
         }
+
+        const generateSeo = await SeoGenerator.generateSEOFields(
+            propertyData.propertyDetailsSchema.propertyType,
+            propertyData.location.city,
+            propertyData.location.district
+        );
 
         await db.transaction(async (tx) => {
             await tx.insert(properties).values({
                 id: propertyId,
-                title: propertyData.seo.seoTitle,
-                description: propertyData.seo.metaDescription,
+                title: generateSeo?.title,
+                description: generateSeo?.seoDescription,
                 propertyType:
                     propertyData.propertyDetailsSchema.propertyType.toUpperCase(),
                 status: "PUBLISHED",
@@ -507,15 +532,15 @@ export class PropertyService {
                 publishedAt: new Date(),
                 createdByType: "ADMIN",
                 createdByAdminId: userID,
-                approvalStatus: "APPROVED",
+                approvalStatus: "PENDING",
             });
 
             await tx.insert(propertySeo).values({
                 propertyId,
-                slug: propertyData.seo.slug,
-                seoTitle: propertyData.seo.seoTitle,
-                seoDescription: propertyData.seo.metaDescription,
-                seoKeywords: propertyData.seo.keywords,
+                seoTitle: generateSeo.seoTitle,
+                seoDescription: generateSeo.seoDescription,
+                slug: generateSeo.slug,
+                seoKeywords: generateSeo.seoKeywords,
             });
             if (processedImages.length > 0) {
                 const imageInserts = processedImages.map((img, index) => ({
@@ -534,11 +559,8 @@ export class PropertyService {
 
             await tx.insert(propertyVerification).values({
                 propertyId,
-                isVerified: true, // Assuming property is verified on creation
-                verificationMessage: "Property approved and published",
-                verificationNotes: null,
-                verifiedBy: userID,
-                verifiedAt: new Date(),
+                isVerified: false, // Assuming property is verified on creation
+                verificationMessage: "Verification Pending",
             });
         });
 
@@ -578,7 +600,17 @@ export class PropertyService {
 
         let processedImages: PropertyImageData[] = [];
         if (images && images.length > 0) {
-            processedImages = await this.processPropertyImages(images);
+            if (images && images.length > 0) {
+                const resolvedUploads = await Promise.all(
+                    images.map(async (upload: any) => {
+                        return await upload.promise;
+                    })
+                );
+
+                processedImages = await this.processPropertyImages(resolvedUploads);
+
+                console.log("🖼️ Processed images:", processedImages);
+            }
         }
 
         const generateSeo = await SeoGenerator.generateSEOFields(
@@ -586,7 +618,8 @@ export class PropertyService {
             propertyData.location.city,
             propertyData.location.district
         );
-        console.log(generateSeo);
+
+        console.log(processedImages);
 
         await db.transaction(async (tx) => {
             await tx.insert(properties).values({
@@ -598,7 +631,9 @@ export class PropertyService {
                 status: "PUBLISHED",
                 price: parseFloat(propertyData.propertyDetailsSchema.totalPrice),
                 area: parseFloat(propertyData.propertyDetailsSchema.area),
-                pricePerUnit: parseFloat(propertyData.propertyDetailsSchema.pricePerUnit),
+                pricePerUnit: parseFloat(
+                    propertyData.propertyDetailsSchema.pricePerUnit
+                ),
                 areaUnit: propertyData.propertyDetailsSchema.areaUnit.toUpperCase(),
                 khasraNumber: propertyData.propertyDetailsSchema.khasraNumber,
                 murabbaNumber: propertyData.propertyDetailsSchema.murabbaNumber,
