@@ -4,6 +4,7 @@ import * as schema from "../../database/schema/index";
 import { logger } from "../../utils/logger";
 import { propertyNotificationService } from "./property-notification.service";
 import { PlatformUserService } from "../../user/user.services";
+import { AdminAuthService } from "./auth.service";
 
 const {
     properties,
@@ -34,6 +35,30 @@ export class PropertyApprovalService {
                 ownerName: user.firstName || "Property Owner",
                 ownerEmail: user.email,
                 ownerPhone: user?.profile?.phone || "Not provided",
+                price: property.price,
+                address: property.address,
+                city: property.city,
+                state: property.state,
+            },
+            action,
+            message,
+            reason,
+            adminName: "Admin Team",
+            reviewDate: new Date().toLocaleDateString("en-IN"),
+        });
+    }
+
+    private static async notifyAdmin(property: any, userId: string, action: "APPROVE" | "REJECT" | "VERIFY" | "UNVERIFY" | "FLAG", message: string, reason?: string) {
+        const user = await AdminAuthService.findAdminById(userId)
+        if (!user) throw new Error("User not found");
+
+        await propertyNotificationService.sendPropertyStatusNotification({
+            property: {
+                id: property.id.toString(),
+                title: property.title,
+                ownerName: user.firstName || "Property Owner",
+                ownerEmail: user.email,
+                ownerPhone: user?.phone || "Not provided",
                 price: property.price,
                 address: property.address,
                 city: property.city,
@@ -82,6 +107,11 @@ export class PropertyApprovalService {
                 this.notifyUser(property, property?.createdByUserId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
             }
 
+            if (property.createdByType === "ADMIN" && property.createdByAdminId) {
+                this.notifyUser(property, property?.createdByAdminId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+            }
+
+
             logger.info(`Property ${propertyId} approved by admin ${adminId}`);
             return updatedProperty;
         } catch (error) {
@@ -126,6 +156,10 @@ export class PropertyApprovalService {
 
             if (property.createdByType === "USER" && property.createdByUserId) {
                 this.notifyUser(property, property.createdByUserId, "REJECT", message || "Your property submission has been rejected.", reason);
+            }
+
+            if (property.createdByType === "ADMIN" && property.createdByAdminId) {
+                this.notifyUser(property, property.createdByAdminId, "REJECT", message || "Your property submission has been rejected.", reason);
             }
 
             logger.info(`Property ${propertyId} rejected by admin ${adminId}`);
@@ -178,6 +212,12 @@ export class PropertyApprovalService {
             if (property.createdByType === "USER" && property.createdByUserId) {
                 this.notifyUser(property, property?.createdByUserId, "VERIFY", message || "Your property has been verified and marked as authentic.");
             }
+            if (property.createdByType === "ADMIN" && property.createdByAdminId) {
+                this.notifyUser(property, property?.createdByAdminId, "VERIFY", message || "Your property has been verified and marked as authentic.");
+            }
+
+
+
 
             logger.info(`Property ${propertyId} verified by admin ${adminId}`);
             return property;
