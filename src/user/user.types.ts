@@ -429,8 +429,6 @@ enum PropertyStatus {
     accountInfo: AccountInfo!
   }
   type SeoPage {
-   
-  
     title: String!
     description: String
     keywords: String
@@ -447,11 +445,21 @@ enum PropertyStatus {
 
   # Queries
     input inputGetPropertyBySlug {
- slug:String!
+    slug:String!
+    }
+
+ type homePageSeo {
+   
+    siteTitle: String!
+    metaDescription: String
+    keywords: String
+    ogTitle: String
+    ogDescription: String
+    ogImage: String
+   
   }
-
   type Query {
-
+    getHomePageSeo:homePageSeo
      getPropertyBySlug(input: inputGetPropertyBySlug!):properties 
     getEnhancedProfile: EnhancedProfile
     getTopProperties: [properties]

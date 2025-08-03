@@ -301,6 +301,10 @@ export const platformUserResolvers = {
         getSeoPageByUrl: async (_: any, { url }: { url: string }) => {
             return await seoService.getSeoPageByUrl(url)
         },
+
+        getHomePageSeo: async (_: any, { url }: { url: string }) => {
+            return await seoService.getGlobalSeoSettings()
+        },
     },
 
     Mutation: {
