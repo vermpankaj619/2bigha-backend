@@ -181,7 +181,7 @@ export const propertySeo = pgTable("property_seo", {
   seoTitle: text("seo_title"), // SEO title (50–60 chars recommended)
   seoDescription: text("seo_description"), // Meta description (150–160 chars)
   seoKeywords: text("seo_keywords"), // Comma-separated keywords
-
+  schema: jsonb("schema"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -65,6 +65,16 @@ type Image {
   alt: String
 }
 
+input UpdateSeoInput {
+  propertyId: ID!
+  slug: String!
+  seoTitle: String!
+  seoDescription: String!
+  seoKeywords: String!
+  seoScore: Int
+  schema: JSON
+}
+
 type PropertyImageVariants {
   thumbnail: String
   medium: String
@@ -454,7 +464,7 @@ type PaginatedProperties {
     createProperty(input: CreatePropertyInput!): Property!
     updateProperty(id: ID!, input: UpdatePropertyInput!): Property!
     deleteProperty(id: ID!): Boolean!
-    
+    updatePropertySeo(input: UpdateSeoInput!): Seo!
     # Status Management
     # approveProperty(id: ID!): Property!
     # rejectProperty(id: ID!, reason: String!): Property!

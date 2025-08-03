@@ -45,6 +45,7 @@ type Seo {
   seoKeywords: String!
   createdAt: String!
   updatedAt: String!
+  schema: JSON
 }
 
 type Verification {
@@ -427,6 +428,18 @@ enum PropertyStatus {
     professionalInfo: ProfessionalInfo
     accountInfo: AccountInfo!
   }
+  type SeoPage {
+   
+  
+    title: String!
+    description: String
+    keywords: String
+    image: String
+    status: String!
+    schemaType: String
+    schemaDescription: String
+  
+  }
 
 
   # Custom Scalar
@@ -444,7 +457,7 @@ enum PropertyStatus {
     getTopProperties: [properties]
     # Get current user profile
     me: PlatformUser
-    
+         getSeoPageByUrl(url: String!): SeoPage
     # Get user by ID
     getUser(id: ID!): PlatformUser
     

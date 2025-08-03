@@ -69,5 +69,27 @@ export const propertyResolvers = {
                 });
             }
         },
+        updatePropertySeo: async (
+            _: any,
+            { input }: { input: any },
+            context: AdminContext
+        ) => {
+            if (!context.admin) {
+                throw new GraphQLError("Not authenticated", {
+                    extensions: { code: "UNAUTHENTICATED" },
+                });
+            }
+
+            try {
+                const updatedSeo = await PropertyService.updateSeoProperty(input);
+                return updatedSeo;
+            } catch (error: any) {
+                console.error("❌ Failed to update SEO:", error);
+                throw new GraphQLError(error.message || "SEO update failed", {
+                    extensions: { code: "INTERNAL_SERVER_ERROR" },
+                });
+            }
+        },
+
     },
 };

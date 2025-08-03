@@ -5,5 +5,6 @@ import { rbacTypeDefs } from './rbac.types';
 import { propertyApprovalEnhancedTypeDefs } from './property-approval.types';
 import { mapPropertiesTypeDefs } from './map-properties.types';
 import { adminDashboardTypeDefs } from './admin-dashboard.types';
+import { seoTypeDefs } from './seo.types';
 
-export const typeDefs = mergeTypeDefs([authTypeDefs, propertyTypeDefs, rbacTypeDefs, propertyApprovalEnhancedTypeDefs, adminDashboardTypeDefs]);
+export const typeDefs = mergeTypeDefs([authTypeDefs, propertyTypeDefs, rbacTypeDefs, propertyApprovalEnhancedTypeDefs, adminDashboardTypeDefs, seoTypeDefs]);
