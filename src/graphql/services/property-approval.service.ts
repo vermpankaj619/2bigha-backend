@@ -108,7 +108,7 @@ export class PropertyApprovalService {
             if (property.createdByType === "USER" && property.createdByUserId) {
                 const user = await PlatformUserService.findUserById(property.createdByUserId);
                 if (user) {
-                    await this.notify(property, user, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+                    await this.notifyUser(property, user, "APPROVE", message || "Your property has been approved and is now live on our platform.");
                 } else {
                     logger.warn(`User with ID ${property.createdByUserId} not found. Skipping notification.`);
                 }
@@ -117,7 +117,7 @@ export class PropertyApprovalService {
             if (property.createdByType === "ADMIN" && property.createdByAdminId) {
                 const admin = await AdminAuthService.findAdminById(property.createdByAdminId);
                 if (admin) {
-                    await this.notify(property, admin, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+                    await this.notifyAdmin(property, admin, "APPROVE", message || "Your property has been approved and is now live on our platform.");
                 } else {
                     logger.warn(`Admin with ID ${property.createdByAdminId} not found. Skipping notification.`);
                 }
@@ -232,7 +232,7 @@ export class PropertyApprovalService {
                 this.notifyUser(property, property?.createdByUserId, "VERIFY", message || "Your property has been verified and marked as authentic.");
             }
             if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                this.notifyUser(property, property?.createdByAdminId, "VERIFY", message || "Your property has been verified and marked as authentic.");
+                this.notifyAdmin(property, property?.createdByAdminId, "VERIFY", message || "Your property has been verified and marked as authentic.");
             }
 
 
