@@ -6,5 +6,7 @@ import { propertyApprovalResolvers } from './property-approval-enhanced.resolver
 import { adminDashboardResolvers } from './admin-dashboard.resolvers';
 import { blogResolvers } from './blog.resolvers';
 import { mapPropertiesResolvers } from './map-properties.resolvers';
+import { seoResolvers } from './seo.resolvers';
 
-export const resolvers: any = mergeResolvers([adminAuthResolvers, propertyResolvers, rbacResolvers, propertyApprovalResolvers, adminDashboardResolvers, mapPropertiesResolvers, blogResolvers]);
+export const resolvers: any = mergeResolvers([adminAuthResolvers, propertyResolvers, rbacResolvers, propertyApprovalResolvers, adminDashboardResolvers, mapPropertiesResolvers, blogResolvers,seoResolvers]);
+

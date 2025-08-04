@@ -45,6 +45,7 @@ type Seo {
   seoKeywords: String!
   createdAt: String!
   updatedAt: String!
+  schema: JSON
 }
 
 type Verification {
@@ -427,6 +428,16 @@ enum PropertyStatus {
     professionalInfo: ProfessionalInfo
     accountInfo: AccountInfo!
   }
+  type SeoPage {
+    title: String!
+    description: String
+    keywords: String
+    image: String
+    status: String!
+    schemaType: String
+    schemaDescription: String
+  
+  }
 
 
   # Custom Scalar
@@ -434,17 +445,27 @@ enum PropertyStatus {
 
   # Queries
     input inputGetPropertyBySlug {
- slug:String!
+    slug:String!
+    }
+
+ type homePageSeo {
+   
+    siteTitle: String!
+    metaDescription: String
+    keywords: String
+    ogTitle: String
+    ogDescription: String
+    ogImage: String
+   
   }
-
   type Query {
-
+    getHomePageSeo:homePageSeo
      getPropertyBySlug(input: inputGetPropertyBySlug!):properties 
     getEnhancedProfile: EnhancedProfile
     getTopProperties: [properties]
     # Get current user profile
     me: PlatformUser
-    
+         getSeoPageByUrl(url: String!): SeoPage
     # Get user by ID
     getUser(id: ID!): PlatformUser
     

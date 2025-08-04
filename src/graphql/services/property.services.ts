@@ -10,7 +10,7 @@ import {
     propertyVerification,
 } from "../../database/schema/index";
 import { azureStorage, FileUpload } from "../../../src/utils/azure-storage";
-import { SeoGenerator } from "./seo.service";
+import { SeoGenerator } from "./seo-generator.service";
 import { error } from "console";
 
 interface PropertyImageData {
@@ -64,6 +64,47 @@ function toWktPolygon(coords: PolygonCoordinate[]): string {
 }
 
 export class PropertyService {
+
+
+    static async updateSeoProperty(input: {
+        propertyId: string;
+        slug: string;
+        seoTitle: string;
+        seoDescription: string;
+        seoKeywords: string;
+        seoScore?: number;
+        schema?: any;
+    }) {
+        const { propertyId, slug, seoTitle, seoDescription, seoKeywords, seoScore, schema } = input;
+
+        // First, check if the SEO entry exists
+        const existing = await db
+            .select()
+            .from(propertySeo)
+            .where(eq(propertySeo.propertyId, propertyId))
+            .limit(1);
+
+        if (!existing.length) {
+            throw new Error("SEO entry not found for the provided property ID.");
+        }
+
+        // Perform the update
+        const result = await db
+            .update(propertySeo)
+            .set({
+                slug,
+                seoTitle,
+                seoDescription,
+                seoKeywords,
+                schema,
+                updatedAt: new Date(),
+            })
+            .where(eq(propertySeo.propertyId, propertyId))
+            .returning();
+
+        return result[0];
+    }
+
     static async processPropertyImages(
         images: FileUpload[],
         metadata: any[] = []

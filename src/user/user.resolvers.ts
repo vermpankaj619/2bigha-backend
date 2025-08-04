@@ -3,6 +3,7 @@ import { GraphQLError } from "graphql";
 import { logInfo, logError } from "../utils/logger";
 import { PlatformUserService } from "./user.services";
 import { PropertyService } from "../graphql/services/property.services";
+import { seoService } from "../graphql/services/seo.service";
 
 interface PlatformUserContext {
     user?: {
@@ -295,6 +296,14 @@ export const platformUserResolvers = {
                     extensions: { code: "INTERNAL_ERROR" },
                 });
             }
+        },
+
+        getSeoPageByUrl: async (_: any, { url }: { url: string }) => {
+            return await seoService.getSeoPageByUrl(url)
+        },
+
+        getHomePageSeo: async (_: any, { url }: { url: string }) => {
+            return await seoService.getGlobalSeoSettings()
         },
     },
 

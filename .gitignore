@@ -30,3 +30,6 @@ dist
 pnpm-lock.yaml
 pnpm-workspace.yaml
 logs/combined.log
+
+logs
+.logs
