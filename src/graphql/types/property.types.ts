@@ -214,6 +214,7 @@ input PropertyDetailsSchemaInput {
   area: String
   areaUnit: String
   totalPrice: String
+  pricePerUnit: String
 }
 
 input ContactDetailsInput {

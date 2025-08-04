@@ -727,7 +727,6 @@ export const platformUserResolvers = {
                     input,
                     context.user.userId
                 );
-
                 return property;
             } catch (error) {
                 console.log(error)
