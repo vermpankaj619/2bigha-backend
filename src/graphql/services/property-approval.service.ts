@@ -115,12 +115,12 @@ export class PropertyApprovalService {
             }
 
             if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                const admin = await AdminAuthService.findAdminById(property.createdByAdminId);
-                if (admin) {
+               const admin = await AdminAuthService.findAdminById(property.createdByAdminId);
+            if (admin) {
                     await this.notifyAdmin(property, admin, "APPROVE", message || "Your property has been approved and is now live on our platform.");
                 } else {
                     logger.warn(`Admin with ID ${property.createdByAdminId} not found. Skipping notification.`);
-                }
+               }
             }
         } catch (notifyError) {
             logger.error(`Failed to send notification for property ${propertyId}:`, notifyError);
@@ -177,9 +177,9 @@ export class PropertyApprovalService {
                 this.notifyUser(property, property.createdByUserId, "REJECT", message || "Your property submission has been rejected.", reason);
             }
 
-            if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                this.notifyUser(property, property.createdByAdminId, "REJECT", message || "Your property submission has been rejected.", reason);
-            }
+         //   if (property.createdByType === "ADMIN" && property.createdByAdminId) {
+           //     this.notifyUser(property, property.createdByAdminId, "REJECT", message || "Your property submission has been rejected.", reason);
+           // }
 
             logger.info(`Property ${propertyId} rejected by admin ${adminId}`);
             return updatedProperty;
@@ -231,9 +231,9 @@ export class PropertyApprovalService {
             if (property.createdByType === "USER" && property.createdByUserId) {
                 this.notifyUser(property, property?.createdByUserId, "VERIFY", message || "Your property has been verified and marked as authentic.");
             }
-            if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                this.notifyAdmin(property, property?.createdByAdminId, "VERIFY", message || "Your property has been verified and marked as authentic.");
-            }
+         //   if (property.createdByType === "ADMIN" && property.createdByAdminId) {
+           //     this.notifyAdmin(property, property?.createdByAdminId, "VERIFY", message || "Your property has been verified and marked as authentic.");
+           // }
 
 
 
