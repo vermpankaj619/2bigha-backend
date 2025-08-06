@@ -387,6 +387,7 @@ enum PropertyStatus {
 input GetPropertiesInput {
   page: Int!
   limit: Int!
+  searchTerm: String
 }
   # Property Queries
  type PaginationMeta {
@@ -444,7 +445,8 @@ type PaginatedProperties {
  extend type Query {
     properties(input: GetPropertiesInput!): PaginatedProperties
     getPendingApprovalProperties(input: GetPropertiesInput!): PaginatedProperties
-   
+    getRejectedProperties(input: GetPropertiesInput!): PaginatedProperties
+    getApprovedProperties(input: GetPropertiesInput!): PaginatedProperties
     # property(id: ID, uuid: String, slug: String): Property
     # featuredProperties(limit: Int): [Property!]!
     # nearbyProperties(latitude: Float!, longitude: Float!, radius: Float!, limit: Int): [Property!]!

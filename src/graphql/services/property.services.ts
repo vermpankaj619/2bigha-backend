@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, like, desc, asc, sql } from "drizzle-orm";
+import { eq, and, gte, lte, like, desc, asc, sql, or } from "drizzle-orm";
 import { db } from "../../database/connection";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -302,19 +302,44 @@ export class PropertyService {
         };
     }
 
-    static async getPendingApprovalProperties(page: number, limit: number) {
-        try {
-            const offset = (page - 1) * limit;
+    static buildSearchCondition(searchTerm?: string) {
+        if (!searchTerm || !searchTerm.trim()) return null;
 
+        const likePattern = `%${searchTerm.trim().toLowerCase()}%`;
+
+        return or(
+            sql`LOWER(COALESCE(${properties.title}, '')) LIKE ${likePattern}`,
+            sql`LOWER(COALESCE(${properties.city}, '')) LIKE ${likePattern}`,
+            sql`LOWER(COALESCE(${properties.ownerName}, '')) LIKE ${likePattern}`,
+            sql`LOWER(COALESCE(${properties.khasraNumber}, '')) LIKE ${likePattern}`,
+            sql`LOWER(COALESCE(${platformUsers.firstName}, '')) LIKE ${likePattern}`,
+            sql`LOWER(COALESCE(${platformUsers.lastName}, '')) LIKE ${likePattern}`,
+            sql`LOWER(COALESCE(${platformUsers.email}, '')) LIKE ${likePattern}`
+        );
+    }
+
+    static async fetchPropertiesByApprovalStatus(
+        status: "PENDING" | "REJECTED" | "APPROVED",
+        page: number,
+        limit: number,
+        searchTerm?: string
+    ) {
+        const offset = (page - 1) * limit;
+
+        const baseCondition = eq(properties.approvalStatus, status);
+        const searchCondition = this.buildSearchCondition(searchTerm);
+        const whereCondition = searchCondition ? and(baseCondition, searchCondition) : baseCondition;
+
+        try {
             const results = await db
                 .select({
                     property: properties,
                     seo: propertySeo,
                     verification: propertyVerification,
                     images: sql`
-                    COALESCE(json_agg(${propertyImages}.*) 
-                    FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
-                `.as("images"),
+          COALESCE(json_agg(${propertyImages}.*)
+          FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
+        `.as("images"),
                     user: {
                         firstName: platformUsers?.firstName,
                         lastName: platformUsers?.lastName,
@@ -324,24 +349,12 @@ export class PropertyService {
                     },
                 })
                 .from(properties)
-                .innerJoin(
-                    propertyVerification,
-                    eq(properties.id, propertyVerification.propertyId)
-                )
-
+                .innerJoin(propertyVerification, eq(properties.id, propertyVerification.propertyId))
                 .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
                 .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
-
-                .where(and(eq(properties.approvalStatus, "PENDING")))
-                .leftJoin(
-                    platformUsers,
-                    eq(properties.createdByUserId, platformUsers.id)
-                )
-
-                .leftJoin(
-                    platformUserProfiles,
-                    eq(platformUserProfiles.userId, platformUsers.id)
-                )
+                .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+                .leftJoin(platformUserProfiles, eq(platformUserProfiles.userId, platformUsers.id))
+                .where(whereCondition)
                 .groupBy(
                     properties.id,
                     propertySeo.id,
@@ -356,9 +369,9 @@ export class PropertyService {
             const [{ count }] = await db
                 .select({ count: sql<number>`COUNT(*)` })
                 .from(properties)
-                .where(and(eq(properties.approvalStatus, "PENDING")));
+                .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+                .where(whereCondition);
 
-            console.log(results);
             return {
                 data: results,
                 meta: {
@@ -369,10 +382,28 @@ export class PropertyService {
                 },
             };
         } catch (error) {
-            console.error("❌ Failed to fetch pending approval properties:", error);
-            throw new Error(`Failed to fetch pending approval properties: ${error}`);
+            console.error(`❌ Failed to fetch ${status.toLowerCase()} properties:`, error);
+            throw new Error(`Failed to fetch ${status.toLowerCase()} properties: ${error}`);
         }
     }
+
+    // Public methods that call the generic fetcher
+
+    static async getPendingApprovalProperties(page: number, limit: number, searchTerm?: string) {
+        return this.fetchPropertiesByApprovalStatus("PENDING", page, limit, searchTerm);
+    }
+
+    static async getRejectedProperties(page: number, limit: number, searchTerm?: string) {
+        return this.fetchPropertiesByApprovalStatus("REJECTED", page, limit, searchTerm);
+    }
+
+    static async getApprovedProperties(page: number, limit: number, searchTerm?: string) {
+        return this.fetchPropertiesByApprovalStatus("APPROVED", page, limit, searchTerm);
+    }
+
+
+
+
 
     static async getPropertyBySlug(slug: string) {
         try {

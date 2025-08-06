@@ -108,7 +108,7 @@ export class PropertyApprovalService {
             }
 
             if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                this.notifyUser(property, property?.createdByAdminId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+                this.notifyAdmin(property, property?.createdByAdminId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
             }
 
 
@@ -159,7 +159,7 @@ export class PropertyApprovalService {
             }
 
             if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                this.notifyUser(property, property.createdByAdminId, "REJECT", message || "Your property submission has been rejected.", reason);
+                this.notifyAdmin(property, property.createdByAdminId, "REJECT", message || "Your property submission has been rejected.", reason);
             }
 
             logger.info(`Property ${propertyId} rejected by admin ${adminId}`);
@@ -213,7 +213,7 @@ export class PropertyApprovalService {
                 this.notifyUser(property, property?.createdByUserId, "VERIFY", message || "Your property has been verified and marked as authentic.");
             }
             if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                this.notifyUser(property, property?.createdByAdminId, "VERIFY", message || "Your property has been verified and marked as authentic.");
+                this.notifyAdmin(property, property?.createdByAdminId, "VERIFY", message || "Your property has been verified and marked as authentic.");
             }
 
 
@@ -257,6 +257,14 @@ export class PropertyApprovalService {
             .orderBy(desc(properties.createdAt))
             .limit(limit).offset(offset);
     }
+
+    static async getRejectedProperties(limit = 20, offset = 0) {
+        return await db.select().from(properties)
+            .where(eq(properties.approvalStatus, "PENDING"))
+            .orderBy(desc(properties.createdAt))
+            .limit(limit).offset(offset);
+    }
+
 
     static async getPropertiesByApprovalStatus(status: "PENDING" | "APPROVED" | "FLAGGED", limit = 20, offset = 0) {
         return await db.select().from(properties)
