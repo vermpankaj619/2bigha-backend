@@ -103,14 +103,24 @@ export class PropertyApprovalService {
                 userAgent,
             });
 
-            if (property.createdByType === "USER" && property.createdByUserId) {
-                this.notifyUser(property, property?.createdByUserId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
-            }
+            // Notifying the owner safely
+            try {
+                if (property.createdByType === "USER" && property.createdByUserId) {
+                    const user = await PlatformUserService.findUserById(property.createdByUserId);
+                    if (user) {
+                        await this.notifyUser(property, property.createdByUserId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+                    } else {
+                        logger.warn(`User with ID ${property.createdByUserId} not found. Skipping notification.`);
+                    }
+                }
 
-            if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                this.notifyAdmin(property, property?.createdByAdminId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+                if (property.createdByType === "ADMIN" && property.createdByAdminId) {
+                    this.notifyAdmin(property, property?.createdByAdminId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+                }
+            } catch (notifyError) {
+                logger.error(`Failed to send notification for property ${propertyId}:`, notifyError);
+                // Not breaking port - continue the flow
             }
-
 
             logger.info(`Property ${propertyId} approved by admin ${adminId}`);
             return updatedProperty;
@@ -119,6 +129,10 @@ export class PropertyApprovalService {
             throw error;
         }
     }
+
+
+
+
 
     static async rejectProperty(input: ApprovalActionInput) {
         const { propertyId, adminId, message, adminNotes, reason, ipAddress, userAgent } = input;
