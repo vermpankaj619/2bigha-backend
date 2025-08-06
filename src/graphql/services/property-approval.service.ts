@@ -72,72 +72,67 @@ export class PropertyApprovalService {
         });
     }
 
-  static async approveProperty(input: ApprovalActionInput) {
-    const { propertyId, adminId, message, adminNotes, reason, ipAddress, userAgent } = input;
-    try {
-        const [property] = await db.select().from(properties).where(eq(properties.id, propertyId.toString()));
-        if (!property) throw new Error("Property not found");
-        const previousStatus = property.approvalStatus;
-
-        const [updatedProperty] = await db.update(properties).set({
-            approvalStatus: "APPROVED",
-            approvalMessage: message,
-            approvedBy: adminId.toString(),
-            approvedAt: new Date(),
-            lastReviewedBy: adminId.toString(),
-            lastReviewedAt: new Date(),
-            adminNotes: adminNotes || property.adminNotes,
-            updatedAt: new Date(),
-        }).where(eq(properties.id, propertyId.toString())).returning();
-
-        await db.insert(propertyApprovalHistory).values({
-            propertyId: propertyId.toString(),
-            adminId: adminId.toString(),
-            action: "approve",
-            previousStatus,
-            newStatus: "approved",
-            message,
-            adminNotes,
-            reason,
-            ipAddress,
-            userAgent,
-        });
-
-        // Notifying the owner safely
+    static async approveProperty(input: ApprovalActionInput) {
+        const { propertyId, adminId, message, adminNotes, reason, ipAddress, userAgent } = input;
         try {
-            if (property.createdByType === "USER" && property.createdByUserId) {
-                const user = await PlatformUserService.findUserById(property.createdByUserId);
-                if (user) {
-                    await this.notifyUser(property, user, "APPROVE", message || "Your property has been approved and is now live on our platform.");
-                } else {
-                    logger.warn(`User with ID ${property.createdByUserId} not found. Skipping notification.`);
+            const [property] = await db.select().from(properties).where(eq(properties.id, propertyId.toString()));
+            if (!property) throw new Error("Property not found");
+            const previousStatus = property.approvalStatus;
+
+            const [updatedProperty] = await db.update(properties).set({
+                approvalStatus: "APPROVED",
+                approvalMessage: message,
+                approvedBy: adminId.toString(),
+                approvedAt: new Date(),
+                lastReviewedBy: adminId.toString(),
+                lastReviewedAt: new Date(),
+                adminNotes: adminNotes || property.adminNotes,
+                updatedAt: new Date(),
+            }).where(eq(properties.id, propertyId.toString())).returning();
+
+            await db.insert(propertyApprovalHistory).values({
+                propertyId: propertyId.toString(),
+                adminId: adminId.toString(),
+                action: "approve",
+                previousStatus,
+                newStatus: "approved",
+                message,
+                adminNotes,
+                reason,
+                ipAddress,
+                userAgent,
+            });
+
+            // Notifying the owner safely
+            try {
+                if (property.createdByType === "USER" && property.createdByUserId) {
+                    const user = await PlatformUserService.findUserById(property.createdByUserId);
+                    if (user) {
+                        await this.notifyUser(property, property.createdByUserId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+                    } else {
+                        logger.warn(`User with ID ${property.createdByUserId} not found. Skipping notification.`);
+                    }
                 }
+
+                if (property.createdByType === "ADMIN" && property.createdByAdminId) {
+                    this.notifyAdmin(property, property?.createdByAdminId, "APPROVE", message || "Your property has been approved and is now live on our platform.");
+                }
+            } catch (notifyError) {
+                logger.error(`Failed to send notification for property ${propertyId}:`, notifyError);
+                // Not breaking port - continue the flow
             }
 
-            if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                const admin = await AdminAuthService.findAdminById(property.createdByAdminId);
-                if (admin) {
-                    await this.notifyAdmin(property, admin, "APPROVE", message || "Your property has been approved and is now live on our platform.");
-                } else {
-                    logger.warn(`Admin with ID ${property.createdByAdminId} not found. Skipping notification.`);
-                }
-            }
-        } catch (notifyError) {
-            logger.error(`Failed to send notification for property ${propertyId}:`, notifyError);
-            // Not breaking port - continue the flow
+            logger.info(`Property ${propertyId} approved by admin ${adminId}`);
+            return updatedProperty;
+        } catch (error) {
+            logger.error(`Error approving property ${propertyId}:`, error);
+            throw error;
         }
-
-        logger.info(`Property ${propertyId} approved by admin ${adminId}`);
-        return updatedProperty;
-    } catch (error) {
-        logger.error(`Error approving property ${propertyId}:`, error);
-        throw error;
     }
-}
 
 
-         
-      
+
+
 
     static async rejectProperty(input: ApprovalActionInput) {
         const { propertyId, adminId, message, adminNotes, reason, ipAddress, userAgent } = input;
@@ -178,7 +173,7 @@ export class PropertyApprovalService {
             }
 
             if (property.createdByType === "ADMIN" && property.createdByAdminId) {
-                this.notifyUser(property, property.createdByAdminId, "REJECT", message || "Your property submission has been rejected.", reason);
+                this.notifyAdmin(property, property.createdByAdminId, "REJECT", message || "Your property submission has been rejected.", reason);
             }
 
             logger.info(`Property ${propertyId} rejected by admin ${adminId}`);
@@ -276,6 +271,14 @@ export class PropertyApprovalService {
             .orderBy(desc(properties.createdAt))
             .limit(limit).offset(offset);
     }
+
+    static async getRejectedProperties(limit = 20, offset = 0) {
+        return await db.select().from(properties)
+            .where(eq(properties.approvalStatus, "PENDING"))
+            .orderBy(desc(properties.createdAt))
+            .limit(limit).offset(offset);
+    }
+
 
     static async getPropertiesByApprovalStatus(status: "PENDING" | "APPROVED" | "FLAGGED", limit = 20, offset = 0) {
         return await db.select().from(properties)

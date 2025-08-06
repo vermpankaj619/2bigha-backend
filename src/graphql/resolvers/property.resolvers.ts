@@ -24,14 +24,44 @@ export const propertyResolvers = {
 
             return results;
         },
-
         getPendingApprovalProperties: async (
             _: any,
-            { input }: { input: { page: number; limit: number } }
+            { input }: { input: { page: number; limit: number; searchTerm?: string } }
         ) => {
             const results = await PropertyService.getPendingApprovalProperties(
                 input.page,
-                input.limit
+                input.limit,
+                input.searchTerm // pass searchTerm here
+            );
+
+            console.log(results);
+
+            return results;
+        },
+
+        getRejectedProperties: async (
+            _: any,
+            { input }: { input: { page: number; limit: number; searchTerm?: string } }
+        ) => {
+            const results = await PropertyService.getRejectedProperties(
+                input.page,
+                input.limit,
+                input.searchTerm
+            );
+
+            console.log(results);
+
+            return results;
+        },
+
+        getApprovedProperties: async (
+            _: any,
+            { input }: { input: { page: number; limit: number; searchTerm?: string } }
+        ) => {
+            const results = await PropertyService.getApprovedProperties(
+                input.page,
+                input.limit,
+                input.searchTerm
             );
 
             console.log(results);
@@ -90,6 +120,5 @@ export const propertyResolvers = {
                 });
             }
         },
-
     },
 };
