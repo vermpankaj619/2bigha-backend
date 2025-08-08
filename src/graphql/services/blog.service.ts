@@ -1,13 +1,14 @@
-import { eq } from "drizzle-orm"
-import { db } from "../../database/connection"
-import { blogPosts, blogStatusEnum } from "../../database/schema/blog"
+import { eq } from "drizzle-orm";
+import { db } from "../../database/connection";
+import { blogPosts, blogStatusEnum, blogPostCategories } from "../../database/schema/blog";
 
 export class BlogService {
-  static async createBlog(input: any) {
+  static async createBlog(input: any, authorId:string) {
+    // Create the blog post
     const newBlog = await db
       .insert(blogPosts)
       .values({
-        authorId: input.authorId,
+        authorId,
         title: input.title,
         slug: input.slug,
         excerpt: input.excerpt,
@@ -19,11 +20,24 @@ export class BlogService {
         seoDescription: input.seoDescription,
         publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
       })
-      .returning()
-    return newBlog[0]
+      .returning();
+
+    const created = newBlog[0];
+
+    // If categories provided, attach them via junction table
+    if (created && Array.isArray(input.categoryIds) && input.categoryIds.length > 0) {
+      const categoryIds: string[] = Array.from(new Set<string>(input.categoryIds as string[])).filter(Boolean);
+      if (categoryIds.length > 0) {
+        await db.insert(blogPostCategories).values(
+          categoryIds.map((categoryId) => ({ postId: created.id, categoryId }))
+        );
+      }
+    }
+
+    return created;
   }
 
-  static async updateBlog(id: string, input: any) {
+  static async updateBlog(id: string, input: any, authorId:string) {
     const updatedBlog = await db
       .update(blogPosts)
       .set({
@@ -40,22 +54,36 @@ export class BlogService {
         updatedAt: new Date(),
       })
       .where(eq(blogPosts.id, id))
-      .returning()
-    return updatedBlog[0]
+      .returning();
+    const updated = updatedBlog[0];
+
+    // If categories provided, reset and add new junctions
+    if (updated && Array.isArray(input.categoryIds)) {
+      // Delete existing mappings
+      await db.delete(blogPostCategories).where(eq(blogPostCategories.postId, id));
+      const categoryIds: string[] = Array.from(new Set<string>(input.categoryIds as string[])).filter(Boolean);
+      if (categoryIds.length > 0) {
+        await db.insert(blogPostCategories).values(
+          categoryIds.map((categoryId) => ({ postId: id, categoryId }))
+        );
+      }
+    }
+
+    return updated;
   }
 
   static async deleteBlog(id: string) {
-    await db.delete(blogPosts).where(eq(blogPosts.id, id))
-    return true
+    await db.delete(blogPosts).where(eq(blogPosts.id, id));
+    return true;
   }
 
   static async getBlogById(id: string) {
-    const blog = await db.select().from(blogPosts).where(eq(blogPosts.id, id))
-    return blog[0]
+    const blog = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return blog[0];
   }
 
   static async getAllBlogs() {
-    const blogs = await db.select().from(blogPosts)
-    return blogs
+    const blogs = await db.select().from(blogPosts);
+    return blogs;
   }
-} 
+}

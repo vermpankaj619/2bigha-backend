@@ -1,13 +1,8 @@
 import { GraphQLError } from "graphql"
 import { BlogService } from "../services/blog.service"
+import { request } from "http"
+import { AdminContext } from "./auth.resolvers";
 
-interface AdminContext {
-  admin?: {
-    adminId: string
-    email: string
-    roles: string[]
-  }
-}
 
 export const blogResolvers = {
   Query: {
@@ -53,13 +48,14 @@ export const blogResolvers = {
   },
   Mutation: {
     createBlog: async (_: any, { input }: any, context: AdminContext) => {
+      console.log(context);
       if (!context.admin) {
         throw new GraphQLError("Authentication required", {
           extensions: { code: "UNAUTHENTICATED" },
         })
       }
       try {
-        const blog = await BlogService.createBlog(input)
+        const blog = await BlogService.createBlog(input, context.admin.adminId)
         return {
           ...blog,
           id: blog.id.toString(),
@@ -81,7 +77,7 @@ export const blogResolvers = {
         })
       }
       try {
-        const blog = await BlogService.updateBlog(id, input)
+        const blog = await BlogService.updateBlog(id, input, context.admin.adminId)
         if (!blog) {
           throw new GraphQLError("Blog not found for update", {
             extensions: { code: "NOT_FOUND" },

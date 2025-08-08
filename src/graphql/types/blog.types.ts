@@ -28,7 +28,6 @@ export const blogTypeDefs = `#graphql
 
   # Blog Input Types
   input CreateBlogInput {
-    authorId: ID!
     title: String!
     slug: String!
     excerpt: String
@@ -39,6 +38,7 @@ export const blogTypeDefs = `#graphql
     seoTitle: String
     seoDescription: String
     publishedAt: Date
+    categoryIds: [ID!]
   }
 
   input UpdateBlogInput {
