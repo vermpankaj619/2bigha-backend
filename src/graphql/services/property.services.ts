@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, like, desc, asc, sql, or } from "drizzle-orm";
+import { eq, and, gte, lte, like, desc, asc, sql, or, ilike } from "drizzle-orm";
 import { db } from "../../database/connection";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -64,8 +64,6 @@ function toWktPolygon(coords: PolygonCoordinate[]): string {
 }
 
 export class PropertyService {
-
-
     static async updateSeoProperty(input: {
         propertyId: string;
         slug: string;
@@ -128,7 +126,7 @@ export class PropertyService {
             if (!bulkResult.success && bulkResult.results.length === 0) {
                 console.error("❌ All image uploads failed.");
                 console.error("Errors:", bulkResult.errors);
-                return []; // or throw new Error("All uploads failed.") if you want to stop completely
+                return [];
             }
 
             for (const result of bulkResult.results) {
@@ -180,8 +178,11 @@ export class PropertyService {
         }
     }
 
-    static async getProperties(page: number, limit: number) {
+    static async getProperties(page: number, limit: number, searchTerm?: string) {
         const offset = (page - 1) * limit;
+        const baseCondition = eq(properties.approvalStatus, "APPROVED");
+        const searchCondition = this.buildSearchCondition(searchTerm);
+        const whereCondition = searchCondition ? and(baseCondition, searchCondition) : baseCondition;
 
         const results = await db
             .select({
@@ -199,9 +200,10 @@ export class PropertyService {
                 eq(properties.id, propertyVerification.propertyId)
             )
             .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
+            .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
             .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
-            .where(eq(properties.approvalStatus, "APPROVED"))
-            .groupBy(properties.id, propertySeo.id, propertyVerification.id)
+            .where(whereCondition)
+            .groupBy(properties.id, propertySeo.id, propertyVerification.id, platformUsers.id)
             .orderBy(desc(properties.createdAt))
             .limit(limit)
             .offset(offset);
@@ -209,7 +211,58 @@ export class PropertyService {
         const [{ count }] = await db
             .select({ count: sql<number>`COUNT(*)` })
             .from(properties)
-            .where(eq(properties.approvalStatus, "APPROVED"));
+            .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+            .where(whereCondition);
+
+        return {
+            data: results,
+            meta: {
+                total: count,
+                page,
+                limit,
+                totalPages: Math.ceil(count / limit),
+            },
+        };
+    }
+
+    static async getPropertiesPostedByAdmin(id: string, page: number, limit: number, searchTerm?: string) {
+        const offset = (page - 1) * limit;
+        const baseCondition = and(
+            eq(properties.approvalStatus, "APPROVED"),
+            eq(properties.createdByAdminId, id)
+        );
+        const searchCondition = this.buildSearchCondition(searchTerm);
+        const whereCondition = searchCondition ? and(baseCondition, searchCondition) : baseCondition;
+
+        const results = await db
+            .select({
+                property: properties,
+                seo: propertySeo,
+                verification: propertyVerification,
+                images: sql`
+                    COALESCE(json_agg(${propertyImages}.*) 
+                    FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
+                `.as("images"),
+            })
+            .from(properties)
+            .innerJoin(
+                propertyVerification,
+                eq(properties.id, propertyVerification.propertyId)
+            )
+            .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
+            .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+            .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
+            .where(whereCondition)
+            .groupBy(properties.id, propertySeo.id, propertyVerification.id, platformUsers.id)
+            .orderBy(desc(properties.createdAt))
+            .limit(limit)
+            .offset(offset);
+
+        const [{ count }] = await db
+            .select({ count: sql<number>`COUNT(*)` })
+            .from(properties)
+            .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+            .where(whereCondition);
 
         return {
             data: results,
@@ -243,8 +296,7 @@ export class PropertyService {
                 .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
                 .where(eq(properties.approvalStatus, "APPROVED"))
                 .groupBy(properties.id, platformUsers.id, propertySeo.id)
-
-                .orderBy(desc(properties.createdAt)) // or `desc(properties.views)` if you have views
+                .orderBy(desc(properties.createdAt))
                 .limit(limit);
 
             return results;
@@ -264,9 +316,7 @@ export class PropertyService {
         const results = await db
             .select({
                 property: properties,
-                // ... add other individual columns you need instead of entire tables
                 seo: propertySeo,
-
                 images: sql`
             COALESCE(
                 json_agg(DISTINCT ${propertyImages}.*) 
@@ -276,10 +326,8 @@ export class PropertyService {
         `.as("images"),
             })
             .from(properties)
-
             .leftJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
             .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
-
             .where(eq(properties.createdByUserId, userId))
             .groupBy(properties.id, propertySeo.id)
             .orderBy(desc(properties.createdAt))
@@ -387,8 +435,6 @@ export class PropertyService {
         }
     }
 
-    // Public methods that call the generic fetcher
-
     static async getPendingApprovalProperties(page: number, limit: number, searchTerm?: string) {
         return this.fetchPropertiesByApprovalStatus("PENDING", page, limit, searchTerm);
     }
@@ -400,10 +446,6 @@ export class PropertyService {
     static async getApprovedProperties(page: number, limit: number, searchTerm?: string) {
         return this.fetchPropertiesByApprovalStatus("APPROVED", page, limit, searchTerm);
     }
-
-
-
-
 
     static async getPropertyBySlug(slug: string) {
         try {
@@ -434,13 +476,13 @@ export class PropertyService {
                 return adminProperty;
             }
 
-            // console.log(property);
             return property;
         } catch (error) {
             console.error("❌ Failed to fetch property by slug:", error);
             throw new Error(`Failed to fetch property with slug "${slug}"`);
         }
     }
+
     static async getPropertyById(id: string) {
         try {
             const [property] = await db
@@ -491,60 +533,6 @@ export class PropertyService {
         }
     }
 
-    // Get single property by ID or UUID
-    // static async getPropertyById(id: number) {
-    //     const [property] = await db.select().from(properties).where(eq(properties.id, id))
-    //     return property
-    // }
-
-    // static async getPropertyByUuid(uuid: string) {
-    //     const [property] = await db.select().from(properties).where(eq(properties.uuid, uuid))
-    //     return property
-    // }
-
-    // Get featured properties
-    // static async getFeaturedProperties(limit = 6) {
-    //     return await db
-    //         .select()
-    //         .from(properties)
-    //         .where(and(eq(properties.isFeatured, true), eq(properties.status, "approved")))
-    //         .limit(limit)
-    //         .orderBy(desc(properties.createdAt))
-    // }
-
-    // // Spatial queries
-    // static async getPropertiesInBounds(minLat: number, maxLat: number, minLng: number, maxLng: number, limit = 50) {
-    //     return await db
-    //         .select()
-    //         .from(properties)
-    //         .where(
-    //             and(
-    //                 sql`latitude BETWEEN ${minLat} AND ${maxLat}`,
-    //                 sql`longitude BETWEEN ${minLng} AND ${maxLng}`,
-    //                 eq(properties.status, "approved"),
-    //             ),
-    //         )
-    //         .limit(limit)
-    // }
-
-    // static async getPropertiesNearPoint(lat: number, lng: number, radiusKm: number, limit = 20) {
-    //     return await db
-    //         .select()
-    //         .from(properties)
-    //         .where(
-    //             and(
-    //                 sql`ST_DWithin(
-    //         location,
-    //         ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography,
-    //         ${radiusKm * 1000}
-    //       )`,
-    //                 eq(properties.status, "approved"),
-    //             ),
-    //         )
-    //         .limit(limit)
-    // }
-
-    // Create property
     static async createProperty(
         propertyData: any,
         userID: string,
@@ -623,7 +611,7 @@ export class PropertyService {
                     altText: img.altText || "",
                     sortOrder: img.sortOrder || index,
                     variants: img.variants,
-                    isMain: img.isMain || index === 0, // First image is main by default
+                    isMain: img.isMain || index === 0,
                 }));
 
                 await tx.insert(propertyImages).values(imageInserts);
@@ -631,12 +619,11 @@ export class PropertyService {
 
             await tx.insert(propertyVerification).values({
                 propertyId,
-                isVerified: false, // Assuming property is verified on creation
+                isVerified: false,
                 verificationMessage: "Verification Pending",
             });
         });
 
-        // Fetch the inserted property, seo, and verification records
         const [property] = await db
             .select()
             .from(properties)
@@ -716,7 +703,6 @@ export class PropertyService {
                 state: propertyData.location.state,
                 pinCode: propertyData.location.pincode,
                 ...parse,
-
                 isActive: true,
                 publishedAt: new Date(),
                 createdByType: "USER",
@@ -739,7 +725,7 @@ export class PropertyService {
                     altText: img.altText || "",
                     sortOrder: img.sortOrder || index,
                     variants: img.variants,
-                    isMain: img.isMain || index === 0, // First image is main by default
+                    isMain: img.isMain || index === 0,
                 }));
 
                 await tx.insert(propertyImages).values(imageInserts);
@@ -747,12 +733,11 @@ export class PropertyService {
 
             await tx.insert(propertyVerification).values({
                 propertyId,
-                isVerified: false, // Assuming property is verified on creation
+                isVerified: false,
                 verificationMessage: "Verification Pending",
             });
         });
 
-        // Fetch the inserted property, seo, and verification records
         const [property] = await db
             .select()
             .from(properties)

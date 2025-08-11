@@ -38,7 +38,7 @@ const startServer = async () => {
     })
 
     await constraintDirective()(schema)
-
+    
     const server = new ApolloServer<MyContext>({
         schema,
         plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
