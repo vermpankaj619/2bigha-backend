@@ -447,6 +447,7 @@ type PaginatedProperties {
     getPendingApprovalProperties(input: GetPropertiesInput!): PaginatedProperties
     getRejectedProperties(input: GetPropertiesInput!): PaginatedProperties
     getApprovedProperties(input: GetPropertiesInput!): PaginatedProperties
+    getPropertiesPostedByAdmin(input: GetPropertiesInput!): PaginatedProperties
     # property(id: ID, uuid: String, slug: String): Property
     # featuredProperties(limit: Int): [Property!]!
     # nearbyProperties(latitude: Float!, longitude: Float!, radius: Float!, limit: Int): [Property!]!

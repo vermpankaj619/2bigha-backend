@@ -15,11 +15,12 @@ export const propertyResolvers = {
     Query: {
         properties: async (
             _: any,
-            { input }: { input: { page: number; limit: number } }
+            { input }: { input: { page: number; limit: number, searchTerm?: string } }
         ) => {
             const results = await PropertyService.getProperties(
                 input.page,
-                input.limit
+                input.limit,
+                input.searchTerm
             );
 
             return results;
@@ -68,6 +69,30 @@ export const propertyResolvers = {
 
             return results;
         },
+
+        getPropertiesPostedByAdmin: async (
+            _: any,
+            { input }: { input: { page: number; limit: number, searchTerm?: string } }, context: AdminContext
+        ) => {
+
+            if (!context.admin) {
+                throw new GraphQLError("Not authenticated", {
+                    extensions: { code: "UNAUTHENTICATED" },
+                });
+            }
+            const results = await PropertyService.getPropertiesPostedByAdmin(
+                context?.admin?.adminId,
+                input.page,
+                input.limit,
+                input?.searchTerm
+
+            );
+
+            return results;
+        },
+
+
+
     },
 
     Mutation: {
