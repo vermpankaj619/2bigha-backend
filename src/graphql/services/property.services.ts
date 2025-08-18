@@ -2,7 +2,7 @@ import { eq, and, gte, lte, like, desc, asc, sql, or, ilike } from "drizzle-orm"
 import { db } from "../../database/connection";
 import { v4 as uuidv4 } from "uuid";
 import {
-    platformUserProfiles,
+    platformUserProfiles,   
     platformUsers,
     properties,
     propertyImages,

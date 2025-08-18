@@ -1,6 +1,7 @@
 export const blogTypeDefs = `#graphql
   # Blog Types
   scalar Date
+  scalar Upload
 
   enum BlogStatus {
     DRAFT
@@ -12,6 +13,7 @@ export const blogTypeDefs = `#graphql
     id: ID!
     uuid: String!
     authorId: ID!
+    authorName: String
     title: String!
     slug: String!
     excerpt: String
@@ -33,6 +35,7 @@ export const blogTypeDefs = `#graphql
     excerpt: String
     content: String!
     featuredImage: String
+    featuredImageFile: Upload
     status: BlogStatus
     tags: [String!]
     seoTitle: String
@@ -47,6 +50,7 @@ export const blogTypeDefs = `#graphql
     excerpt: String
     content: String
     featuredImage: String
+    featuredImageFile: Upload
     status: BlogStatus
     tags: [String!]
     seoTitle: String
