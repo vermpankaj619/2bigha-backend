@@ -26,6 +26,7 @@ export const blogTypeDefs = `#graphql
     publishedAt: Date
     createdAt: Date!
     updatedAt: Date!
+    category : String
   }
 
   # Blog Input Types
@@ -34,14 +35,14 @@ export const blogTypeDefs = `#graphql
     slug: String!
     excerpt: String
     content: String!
-    featuredImage: String
-    featuredImageFile: Upload
+    featuredImage: Upload
     status: BlogStatus
     tags: [String!]
     seoTitle: String
     seoDescription: String
     publishedAt: Date
     categoryIds: [ID!]
+    category : String
   }
 
   input UpdateBlogInput {
@@ -49,8 +50,8 @@ export const blogTypeDefs = `#graphql
     slug: String
     excerpt: String
     content: String
-    featuredImage: String
-    featuredImageFile: Upload
+    featuredImage: Upload
+    image : String
     status: BlogStatus
     tags: [String!]
     seoTitle: String

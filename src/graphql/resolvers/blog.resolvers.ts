@@ -50,7 +50,6 @@ export const blogResolvers = {
   },
   Mutation: {
     createBlog: async (_: any, { input }: any, context: AdminContext) => {
-      console.log(context);
       if (!context.admin) {
         throw new GraphQLError("Authentication required", {
           extensions: { code: "UNAUTHENTICATED" },
@@ -72,6 +71,7 @@ export const blogResolvers = {
         })
       }
     },
+
     updateBlog: async (_: any, { id, input }: any, context: AdminContext) => {
       if (!context.admin) {
         throw new GraphQLError("Authentication required", {

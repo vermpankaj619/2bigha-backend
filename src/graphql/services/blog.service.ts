@@ -1,10 +1,12 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../database/connection";
 import { blogPosts, blogStatusEnum, blogPostCategories } from "../../database/schema/blog";
+import { AzureStorageService } from "../../utils/azure-storage";
 
 export class BlogService {
   static async createBlog(input: any, authorId:string) {
-    // Create the blog post
+    const azureStorage = new AzureStorageService()
+    const uploadedFile = await azureStorage.uploadFile(input.featuredImage.file, "blogs")
     const newBlog = await db
       .insert(blogPosts)
       .values({
@@ -13,7 +15,7 @@ export class BlogService {
         slug: input.slug,
         excerpt: input.excerpt,
         content: input.content,
-        featuredImage: input.featuredImage,
+        featuredImage: uploadedFile[0].url,
         status: input.status || "DRAFT",
         tags: input.tags || [],
         seoTitle: input.seoTitle,
@@ -38,6 +40,13 @@ export class BlogService {
   }
 
   static async updateBlog(id: string, input: any, authorId:string) {
+    let imageUrl = input.image
+    if(input.featuredImage){
+      const azureStorage = new AzureStorageService()
+      const uploadedImage = await azureStorage.uploadFile(input.featuredImage.file, "blogs")
+      imageUrl = uploadedImage[0].url
+    }
+      
     const updatedBlog = await db
       .update(blogPosts)
       .set({
@@ -45,7 +54,7 @@ export class BlogService {
         slug: input.slug,
         excerpt: input.excerpt,
         content: input.content,
-        featuredImage: input.featuredImage,
+        featuredImage: imageUrl,
         status: input.status,
         tags: input.tags,
         seoTitle: input.seoTitle,
