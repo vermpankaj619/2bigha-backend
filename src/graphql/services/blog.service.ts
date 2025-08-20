@@ -15,7 +15,7 @@ export class BlogService {
         slug: input.slug,
         excerpt: input.excerpt,
         content: input.content,
-        featuredImage: uploadedFile[0].url,
+        featuredImage: uploadedFile[2].url,
         status: input.status || "DRAFT",
         tags: input.tags || [],
         seoTitle: input.seoTitle,
@@ -44,7 +44,7 @@ export class BlogService {
     if(input.featuredImage){
       const azureStorage = new AzureStorageService()
       const uploadedImage = await azureStorage.uploadFile(input.featuredImage.file, "blogs")
-      imageUrl = uploadedImage[0].url
+      imageUrl = uploadedImage[2].url
     }
       
     const updatedBlog = await db
