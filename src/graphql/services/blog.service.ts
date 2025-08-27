@@ -1,21 +1,79 @@
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { db } from "../../database/connection";
 import { blogPosts, blogStatusEnum, blogPostCategories } from "../../database/schema/blog";
 import { AzureStorageService } from "../../utils/azure-storage";
 
 export class BlogService {
+  static async generateSlug(title: string): Promise<string> {
+    const base = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+
+    let candidate = base || "post";
+    let counter = 1;
+
+    while (true) {
+      const existing = await db
+        .select({ id: blogPosts.id })
+        .from(blogPosts)
+        .where(eq(blogPosts.slug, candidate))
+        .limit(1);
+      if (existing.length === 0) return candidate;
+      candidate = `${base}-${counter++}`;
+    }
+  }
+
+  static async ensureUniqueSlug(desiredSlug: string, excludeId?: string): Promise<string> {
+    const base = desiredSlug
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+
+    let candidate = base || "post";
+    let counter = 1;
+
+    // Loop until unique, excluding current record when updating
+    while (true) {
+      const where = excludeId
+        ? and(eq(blogPosts.slug, candidate), ne(blogPosts.id, excludeId))
+        : eq(blogPosts.slug, candidate);
+      const existing = await db
+        .select({ id: blogPosts.id })
+        .from(blogPosts)
+        .where(where)
+        .limit(1);
+      if (existing.length === 0) return candidate;
+      candidate = `${base}-${counter++}`;
+    }
+  }
+
   static async createBlog(input: any, authorId:string) {
     const azureStorage = new AzureStorageService()
-    const uploadedFile = await azureStorage.uploadFile(input.featuredImage.file, "blogs")
+    let featuredImageUrl: string | null = null
+    if (input.featuredImage?.file) {
+      const uploadedFile = await azureStorage.uploadFile(input.featuredImage.file, "blogs")
+      featuredImageUrl = uploadedFile?.[2]?.url ?? null
+    }
+
+    // Ensure slug exists and is unique
+    const slug = input.slug
+      ? await this.ensureUniqueSlug(input.slug)
+      : await this.generateSlug(input.title)
+
     const newBlog = await db
       .insert(blogPosts)
       .values({
         authorId,
         title: input.title,
-        slug: input.slug,
+        slug,
         excerpt: input.excerpt,
         content: input.content,
-        featuredImage: uploadedFile[2].url,
+        featuredImage: featuredImageUrl,
         status: input.status || "DRAFT",
         tags: input.tags || [],
         seoTitle: input.seoTitle,
@@ -46,12 +104,18 @@ export class BlogService {
       const uploadedImage = await azureStorage.uploadFile(input.featuredImage.file, "blogs")
       imageUrl = uploadedImage[2].url
     }
-      
+
+    // Handle slug update ensuring uniqueness
+    let slugToSave: string | undefined = undefined
+    if (typeof input.slug === "string" && input.slug.trim().length > 0) {
+      slugToSave = await this.ensureUniqueSlug(input.slug, id)
+    }
+
     const updatedBlog = await db
       .update(blogPosts)
       .set({
         title: input.title,
-        slug: input.slug,
+        slug: slugToSave,
         excerpt: input.excerpt,
         content: input.content,
         featuredImage: imageUrl,
@@ -88,6 +152,11 @@ export class BlogService {
 
   static async getBlogById(id: string) {
     const blog = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return blog[0];
+  }
+
+  static async getBlogBySlug(slug: string) {
+    const blog = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
     return blog[0];
   }
 

@@ -29,6 +29,29 @@ export const blogResolvers = {
         })
       }
     },
+    getBlogBySlug: async (_: any, { slug }: { slug: string }) => {
+      try {
+        const blog = await BlogService.getBlogBySlug(slug)
+        if (!blog) {
+          throw new GraphQLError("Blog not found", {
+            extensions: { code: "NOT_FOUND" },
+          })
+        }
+        return {
+          ...blog,
+          id: blog.id.toString(),
+          authorId: blog.authorId.toString(),
+          authorName: (blog as any).authorName ?? null,
+          publishedAt: blog.publishedAt?.toISOString(),
+          createdAt: blog.createdAt.toISOString(),
+          updatedAt: blog.updatedAt.toISOString(),
+        }
+      } catch (error) {
+        throw new GraphQLError(`Failed to get blog: ${(error as Error).message}`, {
+          extensions: { code: "INTERNAL_ERROR" },
+        })
+      }
+    },
     getAllBlogs: async () => {
       try {
         const blogs = await BlogService.getAllBlogs()

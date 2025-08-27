@@ -61,6 +61,7 @@ export const blogTypeDefs = `#graphql
 
   extend type Query {
     getBlog(id: ID!): Blog
+    getBlogBySlug(slug: String!): Blog
     getAllBlogs: [Blog!]!
   }
 
