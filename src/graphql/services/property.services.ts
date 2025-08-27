@@ -225,6 +225,22 @@ export class PropertyService {
         };
     }
 
+    static async getPropertyTotals(state?: string, city?: string) {
+        const whereBase = eq(properties.approvalStatus, "APPROVED");
+        const withState = state ? and(whereBase, eq(properties.state, state)) : whereBase;
+        const whereCondition = city ? and(withState, eq(properties.city, city)) : withState;
+
+        const [{ totalProperties, totalValue }] = await db
+            .select({
+                totalProperties: sql<number>`COUNT(*)`,
+                totalValue: sql<number>`COALESCE(SUM(${properties.price}), 0)`,
+            })
+            .from(properties)
+            .where(whereCondition);
+
+        return { totalProperties, totalValue };
+    }
+
     static async getPropertiesPostedByAdmin(id: string, page: number, limit: number, searchTerm?: string) {
         const offset = (page - 1) * limit;
         const baseCondition = and(
@@ -305,6 +321,7 @@ export class PropertyService {
             throw new Error("Failed to fetch top properties");
         }
     }
+
 
     static async getPropertiesByUser(
         userId: string,

@@ -39,7 +39,6 @@ export const propertyResolvers = {
 
             return results;
         },
-
         getRejectedProperties: async (
             _: any,
             { input }: { input: { page: number; limit: number; searchTerm?: string } }
@@ -89,6 +88,14 @@ export const propertyResolvers = {
             );
 
             return results;
+        },
+
+        getPropertyTotals: async (
+            _: any,
+            { state, city }: { state?: string; city?: string }
+        ) => {
+            const totals = await PropertyService.getPropertyTotals(state, city)
+            return totals;
         },
 
 

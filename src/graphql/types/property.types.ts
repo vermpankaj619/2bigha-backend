@@ -424,6 +424,12 @@ type PaginatedProperties {
     referrer: String!
     views: Int!
   }
+ 
+  # Simple totals for dashboard
+  type PropertyTotals {
+    totalProperties: Int!
+    totalValue: Float!
+  }
 
   input PropertySort {
     field: PropertySortField!
@@ -448,6 +454,8 @@ type PaginatedProperties {
     getRejectedProperties(input: GetPropertiesInput!): PaginatedProperties
     getApprovedProperties(input: GetPropertiesInput!): PaginatedProperties
     getPropertiesPostedByAdmin(input: GetPropertiesInput!): PaginatedProperties
+    # Dashboard totals
+    getPropertyTotals(state: String, city: String): PropertyTotals!
     # property(id: ID, uuid: String, slug: String): Property
     # featuredProperties(limit: Int): [Property!]!
     # nearbyProperties(latitude: Float!, longitude: Float!, radius: Float!, limit: Int): [Property!]!
