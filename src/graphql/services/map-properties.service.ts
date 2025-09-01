@@ -52,7 +52,7 @@ interface MapProperty {
 
 export class MapPropertiesService {
     // Get all properties optimized for map rendering
-    static async getMapProperties() {
+    static async getMapProperties(userId:string) {
         const limit = 1000 // Default limit for map properties
         console.log(`🗺️ Fetching map properties with limit: ${limit}`)
 
@@ -87,11 +87,28 @@ export class MapPropertiesService {
                           `.as("images"),
                     ownerName: platformUsers.firstName,
                     saleBy: platformUsers.role,
+                    saved: sql<boolean>`
+  BOOL_OR(
+    CASE 
+      WHEN ${schema.savedProperties}.id IS NOT NULL 
+      THEN TRUE 
+      ELSE FALSE 
+    END
+  )
+`.as('saved'),
+                    
 
                 })
                 .from(properties)
                 .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
                 .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+                .leftJoin(
+                    schema.savedProperties,
+                    and(
+                      eq(properties.id, schema.savedProperties.propertyId),
+                      eq(schema.savedProperties.userId, userId)
+                    )
+                  )
                 // .leftJoin(schema.propertyVerification, eq(properties.id, schema.propertyVerification.propertyId))
                 .innerJoin(schema.propertySeo, eq(properties.id, schema.propertySeo.propertyId))
                 .where(eq(properties.approvalStatus, "APPROVED"))

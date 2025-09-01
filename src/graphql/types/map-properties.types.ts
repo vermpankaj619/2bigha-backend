@@ -38,6 +38,7 @@ type PropertyImageVariants {
     ownerName: String
     propertyType: String
     slug: String
+    saved: Boolean
    
   }
 
