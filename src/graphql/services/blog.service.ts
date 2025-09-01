@@ -160,8 +160,15 @@ export class BlogService {
     return blog[0];
   }
 
-  static async getAllBlogs() {
-    const blogs = await db.select().from(blogPosts);
-    return blogs;
+
+  static async getAllBlogs(status?: string) {
+    if (status) {
+      return await db
+        .select()
+        .from(blogPosts)
+        .where(eq(blogPosts.status, status));
+    } else {
+      return await db.select().from(blogPosts);
+    }
   }
 }
