@@ -31,66 +31,10 @@ input unsavePropertyInput {
   propertyId: String
 }
 
-type Property {
-  id: ID!
-  uuid: String
-  title: String!
-  description: String!
-  propertyType: PropertyType!
-  status: String!
-  price: Float!
-  pricePerUnit: Float
-  area: Float!
-  areaUnit: AreaUnit!
-  khasraNumber: String
-  murabbaNumber: String
-  khewatNumber: String
-  address: String
-  city: String
-  district: String
-  state: String
-  country: String
-  pinCode: String
-  latLng: String
-  location: location
-  boundary: JSON
-  calculatedArea: Float
-  geoJson: JSON
-  createdByType: CreatedByType!
-  images: [Image!]!
-  videos: String
-  listingAs: ListingAs!
-  ownerName: String
-  ownerPhone: String
-  ownerWhatsapp: String
-  isFeatured: Boolean!
-  isVerified: Boolean!
-  isActive: Boolean!
-  viewCount: Int!
-  inquiryCount: Int!
-  createdAt: Date!
-  updatedAt: Date!
-  publishedAt: String
-  createdByAdminId: ID
-  createdByUserId: ID
-  approvalStatus: ApprovalStatus!
-  approvalMessage: String
-  approvedBy: ID
-  approvedAt: Date
-  rejectionReason: String
-  rejectedBy: ID
-  rejectedAt: String
-  adminNotes: String
-  lastReviewedBy: ID
-  lastReviewedAt: String
+extend type Property {
+  mainImage: MainImage
   isSaved: Boolean!
   saveCount: Int!
-  viewedCount: Int!
-  viewedAt: Date
-  viewedBy: [ID!]
-  viewedByUser: [PlatformUser!]
-  viewedByUserCount: Int!
-  mainImage: MainImage
 }
 
 type MainImage {
@@ -140,7 +84,6 @@ type PlatformUser {
   email: String!
   firstName: String
   lastName: String
-  role: PlatformUserRole!
   isActive: Boolean!
   isVerified: Boolean!
   emailVerifiedAt: String
@@ -152,40 +95,11 @@ type PlatformUser {
   taxId: String
   createdAt: String!
   updatedAt: String!
-  profile: PlatformUserProfile
   savedProperties: [Property!]!
   savedPropertyCollections: [SavedPropertyCollection!]!
-   savedPropertiesCount: Int! 
+  savedPropertiesCount: Int! 
 }
 
-type PlatformUserProfile {
-  id: ID!
-  bio: String
-  avatar: String
-  phone: String
-  address: String
-  city: String
-  state: String
-  country: String
-  pincode: String
-  website: String
-  socialLinks: JSON
-  preferences: JSON
-  specializations: JSON
-  serviceAreas: JSON
-  languages: JSON
-  experience: Int
-  rating: Int
-  totalReviews: Int
-  createdAt: String!
-  updatedAt: String!
-}
-
-enum PlatformUserRole {
-  OWNER
-  AGENT
-  USER
-}
 
 
 type SavedProperty {
@@ -218,13 +132,6 @@ type savedPropertyResp {
   seo: Seo
 }
 
-type Seo {
-  id: ID!
-  propertyId: ID!
-  slug: String
-  seoTitle: String
-  seoDescription: String
-}
 
 type savedPropertiesData {
   properties: [savedPropertyResp!]!
