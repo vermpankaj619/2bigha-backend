@@ -1010,5 +1010,15 @@ export const platformUserResolvers = {
                 })
             }
         },
+        deletePropertyById : async (_: any, { id }: { id: string },context: PlatformUserContext) => {
+            if (!context.user) {
+                throw new GraphQLError("Not authenticated", {
+                    extensions: { code: "UNAUTHENTICATED" },
+                });
+            }
+            const result = await PropertyService.deletePropertyById(id);
+            console.log('>>>>result>>>>>',result)
+            return result;
+        },
     },
 };

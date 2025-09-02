@@ -780,4 +780,20 @@ export class PropertyService {
 
         return result;
     }
+
+    static async deletePropertyById(id: string) {
+        try{
+            const result = await db.transaction(async (tx) => {
+                await tx.delete(properties).where(eq(properties.id, id));
+                await tx.delete(propertySeo).where(eq(propertySeo.propertyId, id));
+                await tx.delete(propertyVerification).where(eq(propertyVerification.propertyId, id));
+                await tx.delete(propertyImages).where(eq(propertyImages.propertyId, id));
+            });
+            console.log('>>>>result>>>>>',result)
+            return { message: "Property deleted successfully" };
+        }catch(error){
+            console.error("❌ Error deleting property:", error);
+            throw new Error(`Failed to delete property with ID ${id}`);
+        }
+    }
 }

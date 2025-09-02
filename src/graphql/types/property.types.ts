@@ -448,6 +448,9 @@ type PaginatedProperties {
   }
 
 
+
+
+
  extend type Query {
     properties(input: GetPropertiesInput!): PaginatedProperties
     getPendingApprovalProperties(input: GetPropertiesInput!): PaginatedProperties

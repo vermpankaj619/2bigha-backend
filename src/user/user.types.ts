@@ -577,6 +577,11 @@ enum PropertyStatus {
     updatedAt: String!
   }
 
+    type deletePropertyResponse {
+    success: Boolean!
+    message: String!
+  }
+
 
   # Mutations
   type Mutation {
@@ -613,6 +618,7 @@ enum PropertyStatus {
     logout: PlatformAuthResponse!
 
     createPropertyByUser(input: CreatePropertyInput!): properties!
+    deletePropertyById(id: ID!): deletePropertyResponse!
 
 
        # Profile Management - New Specific APIs
