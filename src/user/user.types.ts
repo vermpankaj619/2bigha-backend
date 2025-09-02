@@ -618,7 +618,7 @@ enum PropertyStatus {
     logout: PlatformAuthResponse!
 
     createPropertyByUser(input: CreatePropertyInput!): properties!
-    deletePropertyById(id: ID!): deletePropertyResponse!
+    deletePropertyById(id: ID!): deletePropertyResponse
 
 
        # Profile Management - New Specific APIs

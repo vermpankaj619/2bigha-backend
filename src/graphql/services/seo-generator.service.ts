@@ -46,14 +46,14 @@ export class SeoGenerator {
         return {
             title,
             slug,
-            seoTitle: `${title} | 2bhiga`,
-            seoDescription: `${propertyType} property for sale in ${city}, ${district}. Contact directly on 2bhiga.`,
+            seoTitle: `${title} | 2bigha`,
+            seoDescription: `${propertyType} property for sale in ${city}, ${district}. Contact directly on 2bigha.`,
             seoKeywords: [
                 propertyType?.toLowerCase(),
                 city?.toLowerCase(),
                 district?.toLowerCase(),
                 "property for sale",
-                "2bhiga",
+                "2bigha",
             ]
                 .filter(Boolean)
                 .join(", "),
