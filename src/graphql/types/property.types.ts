@@ -455,7 +455,8 @@ type PaginatedProperties {
     getApprovedProperties(input: GetPropertiesInput!): PaginatedProperties
     getPropertiesPostedByAdmin(input: GetPropertiesInput!): PaginatedProperties
     # Dashboard totals
-    getPropertyTotals(state: String, city: String): PropertyTotals!
+    topProperties(limit: Int): [Property!]!
+    getPropertyTotals(state: String, district: String): PropertyTotals!
     # property(id: ID, uuid: String, slug: String): Property
     # featuredProperties(limit: Int): [Property!]!
     # nearbyProperties(latitude: Float!, longitude: Float!, radius: Float!, limit: Int): [Property!]!

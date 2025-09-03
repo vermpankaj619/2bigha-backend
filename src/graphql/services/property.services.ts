@@ -225,10 +225,10 @@ export class PropertyService {
         };
     }
 
-    static async getPropertyTotals(state?: string, city?: string) {
+    static async getPropertyTotals(state?: string, district?: string) {
         const whereBase = eq(properties.approvalStatus, "APPROVED");
         const withState = state ? and(whereBase, eq(properties.state, state)) : whereBase;
-        const whereCondition = city ? and(withState, eq(properties.city, city)) : withState;
+        const whereCondition = district ? and(withState, eq(properties.district, district)) : withState;
 
         const [{ totalProperties, totalValue }] = await db
             .select({
@@ -291,7 +291,7 @@ export class PropertyService {
         };
     }
 
-    static async getTopProperties(limit = 10) {
+    static async getTopProperties(limit = 5) {
         try {
             const results = await db
                 .select({
