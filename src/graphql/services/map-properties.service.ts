@@ -52,7 +52,7 @@ interface MapProperty {
 
 export class MapPropertiesService {
     // Get all properties optimized for map rendering
-    static async getMapProperties() {
+    static async getMapProperties(userId:string) {
         const limit = 1000 // Default limit for map properties
         console.log(`🗺️ Fetching map properties with limit: ${limit}`)
 
@@ -87,7 +87,180 @@ export class MapPropertiesService {
                           `.as("images"),
                     ownerName: platformUsers.firstName,
                     saleBy: platformUsers.role,
+                    saved: sql<boolean>`
+  BOOL_OR(
+    CASE 
+      WHEN ${schema.savedProperties}.id IS NOT NULL 
+      THEN TRUE 
+      ELSE FALSE 
+    END
+  )
+`.as('saved'),
+                    
 
+                })
+                .from(properties)
+                .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
+                .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+                .leftJoin(
+                    schema.savedProperties,
+                    and(
+                      eq(properties.id, schema.savedProperties.propertyId),
+                      eq(schema.savedProperties.userId, userId)
+                    )
+                  )
+                // .leftJoin(schema.propertyVerification, eq(properties.id, schema.propertyVerification.propertyId))
+                .innerJoin(schema.propertySeo, eq(properties.id, schema.propertySeo.propertyId))
+                .where(eq(properties.approvalStatus, "APPROVED"))
+                .groupBy(properties.id, platformUsers.id, schema.propertySeo.id)
+
+                .orderBy(desc(properties.createdAt)) // or `desc(properties.views)` if you have views
+                .limit(limit);
+
+
+
+            return results
+
+            // let query = await db
+            //     .select({
+            //         id: properties.id,
+            //         title: properties.title,
+            //         description: properties.description,
+            //         propertyType: properties.propertyType,
+            //         listingType: properties.listingAs,
+            //         status: properties.status,
+            //         price: properties.price,
+            //         area: properties.area,
+            //         areaUnit: properties.areaUnit,
+            //         address: properties.address,
+            //         city: properties.city,
+            //         state: properties.state,
+            //         boundaries: properties.geoJson,
+            //         khasraNumber: properties.khasraNumber,
+            //         khewatNumber: properties.khewatNumber,
+            //         listingAs: properties.listingAs,
+            //         ownerName: properties.ownerName,
+            //         isVerified: schema.propertyVerification.isVerified,
+            //         createdAt: properties.createdAt,
+            //         daysOnMarket: sql<number>`EXTRACT(DAY FROM NOW() - ${properties.createdAt})`,
+            //         url: schema.propertySeo.slug,
+            //         // or the correct column
+            //     })
+            //     .from(properties)
+            //     .innerJoin(
+            //         schema.propertyVerification,
+            //         eq(properties.id, schema.propertyVerification.propertyId)
+            //     )
+            //     .innerJoin(schema.propertySeo, eq(properties.id, schema.propertySeo.propertyId))
+            //     .orderBy(desc(properties.createdAt))
+            //     .where(eq(properties.approvalStatus, "APPROVED"))
+
+            // console.log("🔍 Query built for map properties:", query)
+            // return query
+            // Apply filters
+            // const conditions = []
+
+            // // Only show active and approved properties
+            // conditions.push(eq(properties.isActive, true))
+            // conditions.push(eq(properties.approvalStatus, "approved"))
+
+            // // Geographic bounds filter
+            // if (filters.bounds) {
+            //     const { northEast, southWest } = filters.bounds
+            //     conditions.push(
+            //         and(
+            //             gte(properties.latitude, southWest.lat),
+            //             lte(properties.latitude, northEast.lat),
+            //             gte(properties.longitude, southWest.lng),
+            //             lte(properties.longitude, northEast.lng),
+            //         ),
+            //     )
+            // }
+
+            // // Price filters
+            // if (filters.minPrice) conditions.push(gte(properties.price, filters.minPrice))
+            // if (filters.maxPrice) conditions.push(lte(properties.price, filters.maxPrice))
+
+            // // Property type filter
+            // if (filters.propertyTypes && filters.propertyTypes.length > 0) {
+            //     conditions.push(inArray(properties.propertyType, filters.propertyTypes))
+            // }
+
+            // // Area filters
+            // if (filters.minArea) conditions.push(gte(properties.area, filters.minArea))
+            // if (filters.maxArea) conditions.push(lte(properties.area, filters.maxArea))
+
+            // // Location filters
+            // if (filters.cities && filters.cities.length > 0) {
+            //     conditions.push(inArray(properties.city, filters.cities))
+            // }
+            // if (filters.states && filters.states.length > 0) {
+            //     conditions.push(inArray(properties.state, filters.states))
+            // }
+
+            // // Verification filter
+            // if (filters.verified !== undefined) {
+            //     conditions.push(eq(properties.isVerified, filters.verified))
+            // }
+
+            // // Sale by filter
+            // if (filters.saleBy && filters.saleBy.length > 0) {
+            //     conditions.push(inArray(properties.listingAs, filters.saleBy))
+            // }
+
+            // // Apply all conditions
+            // if (conditions.length > 0) {
+            //     query = query.where(and(...conditions))
+            // }
+
+            // // Order by creation date (newest first) and apply limit
+            // const results = await query.orderBy(desc(properties.createdAt)).limit(limit)
+
+            // console.log(`✅ Found ${results.length} properties for map`)
+
+            // // Transform to map format
+            // return results.map(this.transformToMapProperty)
+        } catch (error) {
+            console.error("❌ Error fetching map properties:", error)
+            throw new Error(`Failed to fetch map properties: ${error}`)
+        }
+    }
+
+    static async getMapPropertiesPublic() {
+        const limit = 1000 // Default limit for map properties
+        console.log(`🗺️ Fetching map properties with limit: ${limit}`)
+
+        try {
+            // Build the base query with optimized selection
+            // or appropriate import if using Drizzle
+
+            const results = await db
+                .select({
+                    id: properties.id,
+                    title: properties.title,
+                    description: properties.description,
+                    propertyType: properties.propertyType,
+                    listingType: properties.listingAs,
+                    status: properties.status,
+                    price: properties.price,
+                    area: properties.area,
+                    areaUnit: properties.areaUnit,
+                    address: properties.address,
+                    location: properties?.location,
+                    boundaries: properties.geoJson,
+                    khasraNumber: properties.khasraNumber,
+                    khewatNumber: properties.khewatNumber,
+                    listingAs: properties.listingAs,
+                    isVerified: properties?.isVerified,
+                    createdAt: properties.createdAt,
+                    daysOnMarket: sql<number>`EXTRACT(DAY FROM NOW() - ${properties.createdAt})`,
+                    slug: schema.propertySeo.slug,
+                    images: sql`
+                              COALESCE(json_agg(${propertyImages}.*)
+                              FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
+                          `.as("images"),
+                    ownerName: platformUsers.firstName,
+                    saleBy: platformUsers.role,
                 })
                 .from(properties)
                 .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))

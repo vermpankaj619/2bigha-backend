@@ -62,6 +62,7 @@ export class SavedPropertiesService {
                 isNewSave = true
             }
 
+
             // Add to collections if specified
             if (collectionIds && collectionIds.length > 0) {
                 await this.addPropertyToCollections(savedProperty.id, collectionIds)
@@ -146,9 +147,11 @@ export class SavedPropertiesService {
                     savedProperty: savedProperties,
                     property: properties,
                     propertyImage: propertyImages,
+                    seo: schema.propertySeo
                 })
                 .from(savedProperties)
                 .innerJoin(properties, eq(savedProperties.propertyId, properties.id))
+                .innerJoin(schema.propertySeo, eq(properties.id, schema.propertySeo.propertyId))
                 .leftJoin(propertyImages, and(eq(propertyImages.propertyId, properties.id), eq(propertyImages.isMain, true)))
                 .where(and(eq(savedProperties.userId, userId), eq(savedProperties.isActive, true)))
 
@@ -224,7 +227,6 @@ export class SavedPropertiesService {
 
             // Get user's collections
             const collections = await this.getUserCollections(userId)
-
             return {
                 properties: results.map((result) => ({
                     ...result.savedProperty,
@@ -232,6 +234,9 @@ export class SavedPropertiesService {
                         ...result.property,
                         mainImage: result.propertyImage,
                     },
+                    seo : {
+                        ...result.seo,
+                    }
                 })),
                 totalCount,
                 hasMore: offset + limit < totalCount,

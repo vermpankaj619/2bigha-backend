@@ -15,6 +15,8 @@ import { mapPropertiesTypeDefs } from './graphql/types/map-properties.types'
 import { mapPropertiesResolvers } from './graphql/resolvers/map-properties.resolvers'
 import { blogResolvers } from './graphql/resolvers/blog.resolvers'
 import { blogTypeDefs } from './graphql/types/blog.types'
+import { userPropertyTypeDefs } from './graphql/types/save-user-property.types'
+import { savedPropertiesResolvers } from './graphql/resolvers/saved-properties.resolvers'
 
 dotenv.config()
 
@@ -33,8 +35,8 @@ const startServer = async () => {
 
     // Apply constraint directive and build schema
     const schema = makeExecutableSchema({
-        typeDefs: [platformUserTypeDefs, mapPropertiesTypeDefs,blogTypeDefs],
-        resolvers: [platformUserResolvers, mapPropertiesResolvers,blogResolvers],
+        typeDefs: [platformUserTypeDefs, mapPropertiesTypeDefs,blogTypeDefs,userPropertyTypeDefs],
+        resolvers: [platformUserResolvers, mapPropertiesResolvers,blogResolvers,savedPropertiesResolvers],
     })
 
     await constraintDirective()(schema)

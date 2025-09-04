@@ -95,7 +95,6 @@ export const savedPropertiesResolvers = {
     Mutation: {
         saveProperty: async (_: any, { input }: { input: any }, context: Context) => {
             const user = requirePlatformUser(context)
-
             try {
                 const result = await SavedPropertiesService.saveProperty(
                     user.userId,
@@ -104,7 +103,6 @@ export const savedPropertiesResolvers = {
                     input.notes,
                     input.collectionIds?.map((id: string) => id),
                 )
-
                 return result
             } catch (error) {
                 console.error("Save property error:", error)

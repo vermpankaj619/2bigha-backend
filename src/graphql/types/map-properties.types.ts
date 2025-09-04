@@ -38,6 +38,7 @@ type PropertyImageVariants {
     ownerName: String
     propertyType: String
     slug: String
+    saved: Boolean
    
   }
 
@@ -46,6 +47,7 @@ type PropertyImageVariants {
   extend type Query {
     # Get all properties for map (optimized for speed)
     mapProperties: [MapProperty!]!
+    mapPropertiesPublic : [MapProperty!]!
 
   }
 `

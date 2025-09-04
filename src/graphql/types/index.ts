@@ -7,6 +7,6 @@ import { mapPropertiesTypeDefs } from './map-properties.types';
 import { adminDashboardTypeDefs } from './admin-dashboard.types';
 import { blogTypeDefs } from './blog.types';
 import { seoTypeDefs } from './seo.types';
-
-export const typeDefs = mergeTypeDefs([authTypeDefs, propertyTypeDefs, rbacTypeDefs, propertyApprovalEnhancedTypeDefs, adminDashboardTypeDefs, mapPropertiesTypeDefs, blogTypeDefs, seoTypeDefs]);
+import { userPropertyTypeDefs } from './save-user-property.types';
+export const typeDefs = mergeTypeDefs([userPropertyTypeDefs,authTypeDefs, propertyTypeDefs, rbacTypeDefs, propertyApprovalEnhancedTypeDefs, adminDashboardTypeDefs, mapPropertiesTypeDefs, blogTypeDefs, seoTypeDefs]);
 
