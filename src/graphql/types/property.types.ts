@@ -388,6 +388,7 @@ input GetPropertiesInput {
   page: Int!
   limit: Int!
   searchTerm: String
+  approvalstatus:ApprovalStatus
 }
   # Property Queries
  type PaginationMeta {

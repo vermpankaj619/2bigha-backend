@@ -57,7 +57,7 @@ export class BlogService {
     let featuredImageUrl: string | null = null
     if (input.featuredImage?.file) {
       const uploadedFile = await azureStorage.uploadFile(input.featuredImage.file, "blogs")
-      featuredImageUrl = uploadedFile?.[2]?.url ?? null
+      featuredImageUrl = uploadedFile?.[3]?.url ?? null
     }
 
     // Ensure slug exists and is unique
@@ -102,7 +102,7 @@ export class BlogService {
     if(input.featuredImage){
       const azureStorage = new AzureStorageService()
       const uploadedImage = await azureStorage.uploadFile(input.featuredImage.file, "blogs")
-      imageUrl = uploadedImage[2].url
+      imageUrl = uploadedImage[3].url
     }
 
     // Handle slug update ensuring uniqueness

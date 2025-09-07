@@ -241,15 +241,24 @@ export class PropertyService {
         return { totalProperties, totalValue };
     }
 
-    static async getPropertiesPostedByAdmin(id: string, page: number, limit: number, searchTerm?: string) {
+    static async getPropertiesPostedByAdmin(
+        id: string,
+        page: number,
+        limit: number,
+        approvalstatus?: "APPROVED" | "REJECTED" | "PENDING",
+        searchTerm?: string
+    ) {
         const offset = (page - 1) * limit;
-        const baseCondition = and(
-            eq(properties.approvalStatus, "APPROVED"),
-            eq(properties.createdByAdminId, id)
-        );
+        const conditions = [eq(properties.createdByAdminId, id)];
+        if (approvalstatus) {
+            conditions.push(eq(properties.approvalStatus, approvalstatus));
+        }
         const searchCondition = this.buildSearchCondition(searchTerm);
-        const whereCondition = searchCondition ? and(baseCondition, searchCondition) : baseCondition;
-
+        if (searchCondition) {
+            conditions.push(searchCondition);
+        }
+        const whereCondition = conditions.length > 1 ? and(...conditions) : conditions[0];
+        
         const results = await db
             .select({
                 property: properties,
@@ -370,16 +379,22 @@ export class PropertyService {
     static buildSearchCondition(searchTerm?: string) {
         if (!searchTerm || !searchTerm.trim()) return null;
 
-        const likePattern = `%${searchTerm.trim().toLowerCase()}%`;
+        const likePattern = `%${searchTerm.trim()}%`;
 
         return or(
-            sql`LOWER(COALESCE(${properties.title}, '')) LIKE ${likePattern}`,
-            sql`LOWER(COALESCE(${properties.city}, '')) LIKE ${likePattern}`,
-            sql`LOWER(COALESCE(${properties.ownerName}, '')) LIKE ${likePattern}`,
-            sql`LOWER(COALESCE(${properties.khasraNumber}, '')) LIKE ${likePattern}`,
-            sql`LOWER(COALESCE(${platformUsers.firstName}, '')) LIKE ${likePattern}`,
-            sql`LOWER(COALESCE(${platformUsers.lastName}, '')) LIKE ${likePattern}`,
-            sql`LOWER(COALESCE(${platformUsers.email}, '')) LIKE ${likePattern}`
+            ilike(properties.title, likePattern),
+            ilike(properties.city, likePattern),
+            ilike(properties.district, likePattern),
+            ilike(properties.state, likePattern),
+            ilike(properties.address, likePattern),
+            ilike(properties.ownerName, likePattern),
+            ilike(properties.ownerPhone, likePattern),
+            ilike(properties.khasraNumber, likePattern),
+            ilike(properties.murabbaNumber, likePattern),
+            ilike(properties.khewatNumber, likePattern),
+            ilike(platformUsers.firstName, likePattern),
+            ilike(platformUsers.lastName, likePattern),
+            ilike(platformUsers.email, likePattern)
         );
     }
 

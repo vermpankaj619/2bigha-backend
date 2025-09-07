@@ -73,7 +73,7 @@ export const propertyResolvers = {
       _: any,
       {
         input,
-      }: { input: { page: number; limit: number; searchTerm?: string } },
+      }: { input: { page: number; limit: number; searchTerm?: string; approvalstatus?: "APPROVED" | "REJECTED" | "PENDING" } },
       context: AdminContext
     ) => {
       if (!context.admin) {
@@ -85,6 +85,7 @@ export const propertyResolvers = {
         context?.admin?.adminId,
         input.page,
         input.limit,
+        input?.approvalstatus ,
         input?.searchTerm
       );
 
