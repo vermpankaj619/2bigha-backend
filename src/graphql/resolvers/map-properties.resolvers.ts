@@ -27,26 +27,15 @@ export const mapPropertiesResolvers = {
     Query: {
         // Get all properties for map rendering
         mapProperties: async (_: any, { limit = 1000 }: { limit?: number },context:Context) => {
-            const user = requirePlatformUser(context)
+            const user = context.user
             try {
                 console.log(`🗺️ GraphQL: Fetching map properties with limit ${limit}`)
-
-                return await MapPropertiesService.getMapProperties(user.userId)
+                return await MapPropertiesService.getMapProperties(user?.userId)
             } catch (error) {
                 console.error("❌ GraphQL Error fetching map properties:", error)
                 throw new Error(`Failed to fetch map properties: ${error}`)
             }
-        },
-
-        mapPropertiesPublic: async (_: any, { limit = 1000 }: { limit?: number }) => {
-            try {
-                console.log(`🗺️ GraphQL: Fetching map properties with limit ${limit}`)
-                return await MapPropertiesService.getMapPropertiesPublic()
-            } catch (error) {
-                console.error("❌ GraphQL Error fetching map properties:", error)
-                throw new Error(`Failed to fetch map properties: ${error}`)
-            }
-        },
+        }
 
 
     },
