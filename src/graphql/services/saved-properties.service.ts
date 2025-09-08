@@ -146,14 +146,18 @@ export class SavedPropertiesService {
                 .select({
                     savedProperty: savedProperties,
                     property: properties,
-                    propertyImage: propertyImages,
-                    seo: schema.propertySeo
+                    propertyImage: sql`
+                    COALESCE(json_agg(${propertyImages}.*)
+                    FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
+                `.as("images"),
+                    seo: schema.propertySeo,   
                 })
                 .from(savedProperties)
                 .innerJoin(properties, eq(savedProperties.propertyId, properties.id))
                 .innerJoin(schema.propertySeo, eq(properties.id, schema.propertySeo.propertyId))
                 .leftJoin(propertyImages, and(eq(propertyImages.propertyId, properties.id), eq(propertyImages.isMain, true)))
                 .where(and(eq(savedProperties.userId, userId), eq(savedProperties.isActive, true)))
+                .groupBy(properties.id, schema.propertySeo.id,savedProperties.id)
 
             // Apply filters
             const conditions = [eq(savedProperties.userId, userId), eq(savedProperties.isActive, true)]
@@ -227,22 +231,24 @@ export class SavedPropertiesService {
 
             // Get user's collections
             const collections = await this.getUserCollections(userId)
-            return {
+             const data = {
                 properties: results.map((result) => ({
                     ...result.savedProperty,
                     property: {
                         ...result.property,
-                        mainImage: result.propertyImage,
+                        saved : true
                     },
                     seo : {
                         ...result.seo,
-                    }
+                    },
+                    images : result.propertyImage
                 })),
                 totalCount,
                 hasMore: offset + limit < totalCount,
                 collections,
             }
-        } catch (error) {
+            return data
+        } catch (error:any) {
             console.error("Get saved properties error:", error)
             throw new Error(`Failed to get saved properties: ${error.message}`)
         }

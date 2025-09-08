@@ -287,7 +287,8 @@ export const platformUserResolvers = {
                 //     });
                 // }
 
-                const properties = await PropertyService.getTopProperties();
+                const userId = context.user?.userId;
+                const properties = await PropertyService.getTopProperties(userId?.toString() || '');
                 return properties;
 
 
