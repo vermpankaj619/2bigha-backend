@@ -618,9 +618,10 @@ export class PropertyService {
         }
 
         const generateSeo = await SeoGenerator.generateSEOFields(
+            propertyId,
             propertyData.propertyDetailsSchema.propertyType,
             propertyData.location.city,
-            propertyData.location.district
+            propertyData.location.district,
         );
 
         await db.transaction(async (tx) => {
@@ -731,6 +732,7 @@ export class PropertyService {
         }
 
         const generateSeo = await SeoGenerator.generateSEOFields(
+            propertyId,
             propertyData.propertyDetailsSchema.propertyType,
             propertyData.location.city,
             propertyData.location.district

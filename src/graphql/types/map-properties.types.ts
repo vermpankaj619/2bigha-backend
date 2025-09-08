@@ -39,6 +39,7 @@ type PropertyImageVariants {
     propertyType: String
     slug: String
     saved: Boolean
+    seo : Seo
    
   }
 
