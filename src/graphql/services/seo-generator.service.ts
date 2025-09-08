@@ -13,17 +13,9 @@ export class SeoGenerator {
             .trim();
     }
 
-    static async generateUniqueSlug(baseText: string): Promise<string> {
+    static async generateUniqueSlug(baseText: string,propertyId : string): Promise<string> {
         const baseSlug = this.generateSlug(baseText);
-        let slug = baseSlug;
-        let count = 1;
-
-        while (await this.slugExists(slug)) {
-            slug = `${baseSlug}-${count}`;
-            count++;
-        }
-
-        return slug;
+        return `${baseSlug}-${propertyId}`;
     }
 
     private static async slugExists(slug: string): Promise<boolean> {
@@ -36,12 +28,13 @@ export class SeoGenerator {
     }
 
     static async generateSEOFields(
+        propertyId : string,
         propertyType: string,
         city?: string,
-        district?: string
+        district?: string,
     ) {
         const title = `${propertyType} ${city ? `in ${city}` : ""}${district ? `, ${district}` : ""}`.trim();
-        const slug = await this.generateUniqueSlug(title);
+        const slug = await this.generateUniqueSlug(title,propertyId);
 
         return {
             title,

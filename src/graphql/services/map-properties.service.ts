@@ -79,6 +79,7 @@ export class MapPropertiesService {
                 createdAt: properties.createdAt,
                 daysOnMarket: sql<number>`EXTRACT(DAY FROM NOW() - ${properties.createdAt})`,
                 slug: schema.propertySeo.slug,
+                seo : schema.propertySeo,
                 images: sql`
                           COALESCE(json_agg(${propertyImages}.*)
                           FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
