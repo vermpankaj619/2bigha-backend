@@ -8,6 +8,7 @@ import {
     propertyImages,
     propertySeo,
     propertyVerification,
+    savedProperties,
 } from "../../database/schema/index";
 import { azureStorage, FileUpload } from "../../../src/utils/azure-storage";
 import { SeoGenerator } from "./seo-generator.service";
@@ -300,36 +301,61 @@ export class PropertyService {
         };
     }
 
-    static async getTopProperties(limit = 5) {
+    static async getTopProperties(userId?: string, limit = 5) {
         try {
-            const results = await db
-                .select({
-                    property: properties,
-                    seo: propertySeo,
-                    images: sql`
-                    COALESCE(json_agg(${propertyImages}.*)
-                    FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
-                `.as("images"),
-                    user: platformUsers,
-                })
-                .from(properties)
-                .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
-                .leftJoin(
-                    platformUsers,
-                    eq(properties.createdByUserId, platformUsers.id)
-                )
-                .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
-                .where(eq(properties.approvalStatus, "APPROVED"))
-                .groupBy(properties.id, platformUsers.id, propertySeo.id)
-                .orderBy(desc(properties.createdAt))
-                .limit(limit);
-
-            return results;
-        } catch (error) {
-            console.error("❌ Failed to fetch top properties:", error);
-            throw new Error("Failed to fetch top properties");
+          // Base select
+          const baseSelect: any = {
+            property: properties,
+            seo: propertySeo,
+            images: sql`
+              COALESCE(json_agg(${propertyImages}.*)
+              FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
+            `.as("images"),
+            user: platformUsers,
+          };
+      
+          // Only add "saved" if userId exists
+          if (userId) {
+            baseSelect.saved = sql<boolean>`
+              BOOL_OR(
+                CASE 
+                  WHEN ${savedProperties}.id IS NOT NULL 
+                  THEN TRUE 
+                  ELSE FALSE 
+                END
+              )
+            `.as("saved");
+          }
+      
+          let query = db
+            .select(baseSelect)
+            .from(properties)
+            .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
+            .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+            .innerJoin(propertySeo, eq(properties.id, propertySeo.propertyId))
+            .where(eq(properties.approvalStatus, "APPROVED"))
+            .groupBy(properties.id, platformUsers.id, propertySeo.id)
+            .orderBy(desc(properties.createdAt))
+            .limit(limit);
+      
+          // Conditionally join savedProperties
+          if (userId) {
+            query = query.leftJoin(
+              savedProperties,
+              and(
+                eq(properties.id, savedProperties.propertyId),
+                eq(savedProperties.userId, userId)
+              )
+            );
+          }
+          
+          const results = await query;
+          return results;
+        } catch (err) {
+          console.error("Error fetching top properties:", err);
+          throw err;
         }
-    }
+      }
 
 
     static async getPropertiesByUser(

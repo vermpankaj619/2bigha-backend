@@ -52,56 +52,76 @@ interface MapProperty {
 
 export class MapPropertiesService {
     // Get all properties optimized for map rendering
-    static async getMapProperties() {
+    static async getMapProperties(userId:string) {
         const limit = 1000 // Default limit for map properties
         console.log(`🗺️ Fetching map properties with limit: ${limit}`)
 
         try {
             // Build the base query with optimized selection
             // or appropriate import if using Drizzle
+            const baseSelect:any = {
+                id: properties.id,
+                title: properties.title,
+                description: properties.description,
+                propertyType: properties.propertyType,
+                listingType: properties.listingAs,
+                status: properties.status,
+                price: properties.price,
+                area: properties.area,
+                areaUnit: properties.areaUnit,
+                address: properties.address,
+                location: properties?.location,
+                boundaries: properties.geoJson,
+                khasraNumber: properties.khasraNumber,
+                khewatNumber: properties.khewatNumber,
+                listingAs: properties.listingAs,
+                isVerified: properties?.isVerified,
+                createdAt: properties.createdAt,
+                daysOnMarket: sql<number>`EXTRACT(DAY FROM NOW() - ${properties.createdAt})`,
+                slug: schema.propertySeo.slug,
+                images: sql`
+                          COALESCE(json_agg(${propertyImages}.*)
+                          FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
+                      `.as("images"),
+                ownerName: platformUsers.firstName,
+                saleBy: platformUsers.role
+            }
 
-            const results = await db
-                .select({
-                    id: properties.id,
-                    title: properties.title,
-                    description: properties.description,
-                    propertyType: properties.propertyType,
-                    listingType: properties.listingAs,
-                    status: properties.status,
-                    price: properties.price,
-                    area: properties.area,
-                    areaUnit: properties.areaUnit,
-                    address: properties.address,
-                    location: properties?.location,
-                    boundaries: properties.geoJson,
-                    khasraNumber: properties.khasraNumber,
-                    khewatNumber: properties.khewatNumber,
-                    listingAs: properties.listingAs,
-                    isVerified: properties?.isVerified,
-                    createdAt: properties.createdAt,
-                    daysOnMarket: sql<number>`EXTRACT(DAY FROM NOW() - ${properties.createdAt})`,
-                    slug: schema.propertySeo.slug,
-                    images: sql`
-                              COALESCE(json_agg(${propertyImages}.*)
-                              FILTER (WHERE ${propertyImages}.id IS NOT NULL), '[]')
-                          `.as("images"),
-                    ownerName: platformUsers.firstName,
-                    saleBy: platformUsers.role,
+            if (userId) {
+                baseSelect.saved = sql<boolean>`
+                  BOOL_OR(
+                    CASE 
+                      WHEN ${schema.savedProperties}.id IS NOT NULL 
+                      THEN TRUE 
+                      ELSE FALSE 
+                    END
+                  )
+                `.as("saved");
+              }
 
-                })
-                .from(properties)
-                .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
-                .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
-                // .leftJoin(schema.propertyVerification, eq(properties.id, schema.propertyVerification.propertyId))
-                .innerJoin(schema.propertySeo, eq(properties.id, schema.propertySeo.propertyId))
-                .where(eq(properties.approvalStatus, "APPROVED"))
-                .groupBy(properties.id, platformUsers.id, schema.propertySeo.id)
+            let query = db
+            .select(baseSelect)
+            .from(properties)
+            .leftJoin(propertyImages, eq(properties.id, propertyImages.propertyId))
+            .leftJoin(platformUsers, eq(properties.createdByUserId, platformUsers.id))
+            // .leftJoin(schema.propertyVerification, eq(properties.id, schema.propertyVerification.propertyId))
+            .innerJoin(schema.propertySeo, eq(properties.id, schema.propertySeo.propertyId))
+            .where(eq(properties.approvalStatus, "APPROVED"))
+            .groupBy(properties.id, platformUsers.id, schema.propertySeo.id)
 
-                .orderBy(desc(properties.createdAt)) // or `desc(properties.views)` if you have views
-                .limit(limit);
+            .orderBy(desc(properties.createdAt)) // or `desc(properties.views)` if you have views
+            .limit(limit);
 
-
-
+            if(userId) {
+                query = query.leftJoin(
+                    schema.savedProperties,
+                    and(
+                      eq(properties.id, schema.savedProperties.propertyId),
+                      eq(schema.savedProperties.userId, userId)
+                    )
+                  )
+            }
+            const results = await query
             return results
 
             // let query = await db

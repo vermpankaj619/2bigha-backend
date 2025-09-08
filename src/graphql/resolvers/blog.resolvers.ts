@@ -52,9 +52,11 @@ export const blogResolvers = {
         })
       }
     },
-    getAllBlogs: async () => {
+
+    getAllBlogs: async (_: any, args: { status?: string }) => {
+      const { status } = args
       try {
-        const blogs = await BlogService.getAllBlogs()
+        const blogs = await BlogService.getAllBlogs(status)
         return blogs.map(blog => ({
           ...blog,
           id: blog.id.toString(),
@@ -72,6 +74,7 @@ export const blogResolvers = {
     },
   },
   Mutation: {
+
     createBlog: async (_: any, { input }: any, context: AdminContext) => {
       if (!context.admin) {
         throw new GraphQLError("Authentication required", {
