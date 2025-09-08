@@ -456,10 +456,9 @@ export const savedPropertiesResolvers = {
 
     // Extend existing Property type
     Property: {
-        isSaved: async (parent: any, _: any, context: Context) => {
+        saved: async (parent: any, _: any, context: Context) => {
             if (!context.user) return false
-
-            return await SavedPropertiesService.isPropertySaved(Number.parseInt(context.user.userId), parent.id)
+            return await SavedPropertiesService.isPropertySaved(context.user.userId.toString(), parent.id)
         },
 
         saveCount: async (parent: any) => {

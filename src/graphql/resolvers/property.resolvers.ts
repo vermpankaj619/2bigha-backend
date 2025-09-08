@@ -101,7 +101,7 @@ export const propertyResolvers = {
 
     topProperties: async () => {
       try {
-        const properties = await PropertyService.getTopProperties(5);
+        const properties = await PropertyService.getTopProperties('',5);
 
         return properties.map((entry) => ({
           ...entry.property,

@@ -31,17 +31,22 @@ input unsavePropertyInput {
   propertyId: String
 }
 
+type PropertyImageVariants {
+
+  medium: String
+ 
+}
+  type PropertyImage {
+
+  variants: PropertyImageVariants
+  
+}
+
 extend type Property {
-  mainImage: MainImage
-  isSaved: Boolean!
+  saved: Boolean
   saveCount: Int!
 }
 
-type MainImage {
-  id : ID!
-  imageUrl: String
-  propertyId: ID!
-}
 
 type SavedPropertyCollection {
   id: ID!
@@ -130,6 +135,7 @@ type savedPropertyResp {
   isActive: Boolean!
   property: Property 
   seo: Seo
+  images: [PropertyImage!]!
 }
 
 

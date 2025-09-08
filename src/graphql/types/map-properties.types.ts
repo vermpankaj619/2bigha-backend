@@ -47,7 +47,5 @@ type PropertyImageVariants {
   extend type Query {
     # Get all properties for map (optimized for speed)
     mapProperties: [MapProperty!]!
-    mapPropertiesPublic : [MapProperty!]!
-
   }
 `

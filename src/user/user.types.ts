@@ -131,12 +131,14 @@ type Property {
   adminNotes: String
   lastReviewedBy: ID
   lastReviewedAt: String
+  saved: Boolean
  
 }
 type properties {
   seo: Seo
   property: Property
   images: [PropertyImage]
+  saved : Boolean
 }
 
 
